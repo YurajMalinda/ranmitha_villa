@@ -40,9 +40,11 @@ const bookingSchema = new Schema(
       default: 'pending',
     },
     total_price: { type: Number, required: true },
+    // Checkout hold. 15 minutes is the usual window for a guest to finish
+    // entering their details; the TTL index below reaps abandoned holds.
     expiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 5 * 60 * 1000),
+      default: () => new Date(Date.now() + 15 * 60 * 1000),
     },
   },
   { timestamps: true }
