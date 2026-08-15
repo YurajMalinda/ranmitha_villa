@@ -5,7 +5,7 @@ import { connectDB } from '@/lib/db'
 import bookingService from '@/services/booking.service'
 import ActivityLogService from '@/services/activityLog.service'
 import NotificationService from '@/services/notification.service'
-import { verifyAdminToken, adminActor } from '@/lib/auth'
+import { verifyAdminToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
-    const adminPayload = await verifyAdminToken(token)
+    await verifyAdminToken(token)
 
     await connectDB()
     const { bookingId, status } = await request.json()
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const updated = await bookingService.adminUpdateStatus(bookingId, status)
-    await ActivityLogService.log('UPDATE_STATUS', 'Booking', bookingId, `Status updated to ${status}`, adminActor(adminPayload))
+    await ActivityLogService.log('UPDATE_STATUS', 'Booking', bookingId, `Status updated to ${status}`)
 
     if (status === 'pending') {
       await NotificationService.create({

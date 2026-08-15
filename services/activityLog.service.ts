@@ -1,14 +1,8 @@
 import { connectDB } from '@/lib/db'
 import ActivityLog from '@/models/ActivityLog'
 
-export type Actor = { adminId?: string; name?: string }
-
 const ActivityLogService = {
-  /**
-   * `actor` is optional so guest-triggered actions (a booking confirmation) still
-   * log without one. Pass `adminActor(payload)` from any admin route.
-   */
-  log: async (action: string, entity: string, entityId?: string, details?: string, actor?: Actor) => {
+  log: async (action: string, entity: string, entityId?: string, details?: string) => {
     try {
       await connectDB()
       await ActivityLog.create({
@@ -16,8 +10,6 @@ const ActivityLogService = {
         entity,
         entityId,
         details,
-        actorId: actor?.adminId,
-        actorName: actor?.name,
       })
     } catch (error) {
       console.error('Failed to create activity log:', error)

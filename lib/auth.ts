@@ -32,25 +32,13 @@ export async function verifyAdminRequest(request: NextRequest): Promise<{ succes
   }
 }
 
-/** Pulls the acting admin out of a verified token payload, for ActivityLog. */
-export function adminActor(payload: any): { adminId?: string; name?: string } {
-  return { adminId: payload?.adminId, name: payload?.name ?? payload?.username }
-}
-
 export async function verifyUserToken(token: string) {
   const { payload } = await jwtVerify(token, secret)
   return payload
 }
 
-/**
- * `actor` rides in the token so every admin route can attribute an action
- * without a second database lookup.
- */
-export async function signAdminToken(
-  username: string,
-  actor?: { adminId: string; name: string }
-) {
-  return new SignJWT({ username, role: 'admin', ...actor })
+export async function signAdminToken(username: string) {
+  return new SignJWT({ username, role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('24h')
     .sign(secret)

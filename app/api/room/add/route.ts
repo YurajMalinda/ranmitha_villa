@@ -5,7 +5,7 @@ import { connectDB } from '@/lib/db'
 import roomService from '@/services/room.service'
 import { uploadBuffer } from '@/lib/cloudinary'
 import ActivityLogService from '@/services/activityLog.service'
-import { verifyAdminToken, adminActor } from '@/lib/auth'
+import { verifyAdminToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
-    const adminPayload = await verifyAdminToken(token)
+    await verifyAdminToken(token)
 
     await connectDB()
     const formData = await request.formData()
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const room = await roomService.createRoom(body, imageUrls)
-    await ActivityLogService.log('CREATE_ROOM', 'Room', (room as any)._id?.toString(), `Room ${(room as any).type} created`, adminActor(adminPayload))
+    await ActivityLogService.log('CREATE_ROOM', 'Room', (room as any)._id?.toString(), `Room ${(room as any).type} created`)
 
     return NextResponse.json({ success: true, message: 'New room successfully added!' }, { status: 201 })
   } catch (error: any) {
