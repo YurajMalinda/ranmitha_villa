@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Check, X } from 'lucide-react';
 import { TourService } from '@/services/frontend/tour.service';
@@ -83,10 +84,12 @@ export function ExperiencesSection() {
 
                 <div className="h-48 overflow-hidden relative bg-[#EFF7F3]">
                   {tour.images[0] && (
-                    <img
+                    <Image
                       src={tour.images[0]}
                       alt={tour.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   )}
                   <div className="absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-[#2E5D4B]">
@@ -135,12 +138,15 @@ export function ExperiencesSection() {
               {selectedTour.images.length > 0 && (
                 <div className="relative h-64 md:h-96 bg-gray-100 overflow-x-auto snap-x snap-mandatory flex custom-scrollbar">
                   {selectedTour.images.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`${selectedTour.title} ${idx + 1}`}
-                      className="w-full h-full object-cover flex-shrink-0 snap-center"
-                    />
+                    <div key={idx} className="relative h-full flex-shrink-0 snap-center" style={{ minWidth: '100%' }}>
+                      <Image
+                        src={img}
+                        alt={`${selectedTour.title} ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 672px"
+                        className="object-cover"
+                      />
+                    </div>
                   ))}
                   {selectedTour.images.length > 1 && (
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">

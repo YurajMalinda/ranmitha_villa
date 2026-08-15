@@ -4,12 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, MessageCircle, Calendar } from 'lucide-react';
 import { navbarData } from '@/data/navbar';
+import { useBooking } from '@/components/booking/BookingContext';
 
-interface NavbarProps {
-  onOpenBooking?: () => void;
-}
-
-export function Navbar({ onOpenBooking }: NavbarProps) {
+export function Navbar() {
+  const { openBooking } = useBooking();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -70,7 +68,7 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
 
             {/* Book Now (Primary) */}
             <button
-              onClick={onOpenBooking}
+              onClick={openBooking}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg transform hover:-translate-y-0.5 ${isScrolled ? 'bg-[#2E5D4B] text-white hover:bg-[#1E4A3A]' : 'bg-[#D4784A] text-white hover:bg-[#B85F30]'}`}>
               <Calendar className="w-4 h-4" />
               Book Now
@@ -141,7 +139,7 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      if (onOpenBooking) onOpenBooking();
+                      openBooking();
                     }}
                     className="flex items-center justify-center gap-2 w-full bg-[#2E5D4B] text-white py-3 rounded-lg font-bold shadow-lg">
                     <Calendar className="w-4 h-4" />

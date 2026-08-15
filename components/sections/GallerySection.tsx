@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
@@ -31,8 +31,37 @@ export function GallerySection() {
         ? images.findIndex(img => img._id === selectedImage._id)
         : -1;
 
-    const goToPrevious = () => { if (currentIndex > 0) setSelectedImage(images[currentIndex - 1]); };
-    const goToNext = () => { if (currentIndex < images.length - 1) setSelectedImage(images[currentIndex + 1]); };
+    const goToPrevious = useCallback(() => {
+        setSelectedImage((current) => {
+            const i = current ? images.findIndex(img => img._id === current._id) : -1;
+            return i > 0 ? images[i - 1] : current;
+        });
+    }, [images]);
+
+    const goToNext = useCallback(() => {
+        setSelectedImage((current) => {
+            const i = current ? images.findIndex(img => img._id === current._id) : -1;
+            return i > -1 && i < images.length - 1 ? images[i + 1] : current;
+        });
+    }, [images]);
+
+    // Lightbox: lock body scroll, and wire Escape / arrow keys.
+    useEffect(() => {
+        if (!selectedImage) return;
+
+        document.body.style.overflow = 'hidden';
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setSelectedImage(null);
+            if (e.key === 'ArrowLeft') goToPrevious();
+            if (e.key === 'ArrowRight') goToNext();
+        };
+        window.addEventListener('keydown', onKey);
+
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            document.body.style.overflow = '';
+        };
+    }, [selectedImage, goToPrevious, goToNext]);
 
     return (
         <section id="gallery" className="py-20 md:py-28 px-4 md:px-8 bg-[#FBF8F3]">
@@ -111,20 +140,23 @@ export function GallerySection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={selectedImage.title}
                         className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
                         onClick={() => setSelectedImage(null)}>
 
-                        <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 text-white/70 hover:text-white p-2 z-10">
+                        <button onClick={() => setSelectedImage(null)} aria-label="Close gallery" className="absolute top-4 right-4 text-white/70 hover:text-white p-2 z-10">
                             <X className="w-8 h-8" />
                         </button>
 
                         {currentIndex > 0 &&
-                            <button onClick={(e) => { e.stopPropagation(); goToPrevious(); }} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 bg-white/10 rounded-full backdrop-blur-sm z-10">
+                            <button onClick={(e) => { e.stopPropagation(); goToPrevious(); }} aria-label="Previous image" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 bg-white/10 rounded-full backdrop-blur-sm z-10">
                                 <ChevronLeft className="w-8 h-8" />
                             </button>
                         }
                         {currentIndex < images.length - 1 &&
-                            <button onClick={(e) => { e.stopPropagation(); goToNext(); }} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 bg-white/10 rounded-full backdrop-blur-sm z-10">
+                            <button onClick={(e) => { e.stopPropagation(); goToNext(); }} aria-label="Next image" className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 bg-white/10 rounded-full backdrop-blur-sm z-10">
                                 <ChevronRight className="w-8 h-8" />
                             </button>
                         }
@@ -137,7 +169,13 @@ export function GallerySection() {
                             className="max-w-5xl max-h-[80vh] relative"
                             onClick={(e) => e.stopPropagation()}>
 
-                            <img src={selectedImage.src} alt={selectedImage.alt} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+                            <Image
+                                src={selectedImage.src}
+                                alt={selectedImage.alt}
+                                width={1600}
+                                height={1200}
+                                sizes="(max-width: 1024px) 100vw, 1024px"
+                                className="w-auto max-w-full max-h-[70vh] object-contain rounded-lg" />
 
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
                                 <h3 className="text-white font-bold text-xl">{selectedImage.title}</h3>

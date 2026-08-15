@@ -1,6 +1,5 @@
-'use client'
-
-import { useState } from 'react';
+import { MotionProvider } from '@/components/providers/MotionProvider';
+import { BookingProvider } from '@/components/booking/BookingContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { WelcomeSection } from '@/components/sections/WelcomeSection';
@@ -13,52 +12,46 @@ import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
 import { FAQSection } from '@/components/sections/FAQSection';
 import { ContactSection } from '@/components/sections/ContactSection';
 import { Footer } from '@/components/layout/Footer';
-import { BookingModal } from '@/components/booking/BookingModal';
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 export default function HomePage() {
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar onOpenBooking={() => setIsBookingOpen(true)} />
+    <MotionProvider>
+      <BookingProvider>
+        <div className="min-h-screen bg-white">
+          <Navbar />
 
-      <main>
-        <section id="home">
-          <HeroSection />
-        </section>
+          <main>
+            <section id="home">
+              <HeroSection />
+            </section>
 
-        <WelcomeSection />
+            <WelcomeSection />
 
-        <RoomsSection onOpenBooking={() => setIsBookingOpen(true)} />
+            <RoomsSection />
 
-        <GallerySection />
+            <GallerySection />
 
-        <section id="tours">
-          <ExperiencesSection />
-        </section>
+            <ExperiencesSection />
 
-        <LocationSection />
+            <LocationSection />
 
-        <AmenitiesGrid />
+            <AmenitiesGrid />
 
-        <TestimonialsSection />
+            <TestimonialsSection />
 
-        <FAQSection />
+            <FAQSection />
 
-        <ContactSection />
-      </main>
+            <ContactSection />
+          </main>
 
-      <Footer />
+          <Footer />
 
-<BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-      />
-
-      <WhatsAppButton />
-      <ScrollToTop />
-    </div>
+          <WhatsAppButton />
+          <ScrollToTop />
+        </div>
+      </BookingProvider>
+    </MotionProvider>
   );
 }
