@@ -1,11 +1,12 @@
+import LoginAttempt from '@/models/LoginAttempt'
+
 /**
- * Minimal in-memory fixed-window rate limiter.
+ * Fixed-window rate limiting.
  *
- * LIMITATION: state lives in the process, so on serverless each warm instance
- * keeps its own counter and a cold start resets it. It raises the cost of a
- * brute-force attempt but does not make one impossible. For a hard guarantee
- * this needs shared state (Upstash Redis, Vercel KV, or the MongoDB you already
- * run). Treat this as defence in depth, not as the whole defence.
+ * `rateLimitShared` counts in MongoDB, so the window holds across serverless
+ * instances and survives cold starts. `rateLimit` is the in-memory fallback,
+ * used only when the database is unreachable — per-process and therefore
+ * weaker, but better than counting nothing.
  */
 
 type Entry = { count: number; resetAt: number }
@@ -35,6 +36,50 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateLim
   }
 
   return { allowed: true, remaining: limit - entry.count, retryAfterSeconds }
+}
+
+/**
+ * Shared-state limiter. One atomic upsert per call: the window is created if
+ * absent or expired, otherwise the counter increments. Because the read and the
+ * increment happen in a single findOneAndUpdate, concurrent requests across
+ * instances cannot race past the limit.
+ *
+ * Falls back to the in-memory limiter if Mongo is unavailable, so a database
+ * blip cannot lock every admin out of logging in.
+ */
+export async function rateLimitShared(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<RateLimitResult> {
+  const now = new Date()
+
+  try {
+    const existing = await LoginAttempt.findOneAndUpdate(
+      { key, resetAt: { $gt: now } },
+      { $inc: { count: 1 } },
+      { new: true }
+    )
+
+    if (existing) {
+      const retryAfterSeconds = Math.max(1, Math.ceil((existing.resetAt.getTime() - now.getTime()) / 1000))
+      if (existing.count > limit) {
+        return { allowed: false, remaining: 0, retryAfterSeconds }
+      }
+      return { allowed: true, remaining: limit - existing.count, retryAfterSeconds }
+    }
+
+    // No live window: start a new one (upsert also replaces an expired row).
+    await LoginAttempt.findOneAndUpdate(
+      { key },
+      { $set: { count: 1, resetAt: new Date(now.getTime() + windowMs) } },
+      { upsert: true }
+    )
+    return { allowed: true, remaining: limit - 1, retryAfterSeconds: 0 }
+  } catch (err: any) {
+    console.error('Shared rate limit unavailable, falling back to in-memory:', err.message)
+    return rateLimit(key, limit, windowMs)
+  }
 }
 
 /** Best-effort client IP from proxy headers. */

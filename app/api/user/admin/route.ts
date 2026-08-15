@@ -3,14 +3,18 @@ export const runtime = 'nodejs'
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db'
 import authService from '@/services/auth.service'
-import { rateLimit, clientIp } from '@/lib/rate-limit'
+import { rateLimitShared, clientIp } from '@/lib/rate-limit'
 
 const MAX_ATTEMPTS = 8
 const WINDOW_MS = 10 * 60 * 1000 // 10 minutes
 
 export async function POST(request: NextRequest) {
   try {
-    const limit = rateLimit(`admin-login:${clientIp(request)}`, MAX_ATTEMPTS, WINDOW_MS)
+    // Connect before rate limiting so the counter uses shared state rather than
+    // silently falling back to per-instance memory.
+    await connectDB()
+
+    const limit = await rateLimitShared(`admin-login:${clientIp(request)}`, MAX_ATTEMPTS, WINDOW_MS)
     if (!limit.allowed) {
       return NextResponse.json(
         { success: false, message: 'Too many login attempts. Please try again later.' },
@@ -18,7 +22,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await connectDB()
     const body = await request.json()
     const { token } = await authService.authenticateUser(body)
 
