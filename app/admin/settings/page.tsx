@@ -32,8 +32,13 @@ function SettingsContent() {
                                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Authentication</span>
                             </div>
                             <p className="text-sm text-gray-700 dark:text-gray-300">
-                                This admin account is managed via server environment variables.
-                                Password changes must be done by updating the server configuration.
+                                Admin accounts are stored in the database with hashed passwords.
+                                Add an account, or change a password, with{' '}
+                                <code className="text-xs bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                                    scripts/admin-accounts.mjs
+                                </code>.
+                                The credential in the server environment is a recovery key only —
+                                every use of it is logged.
                             </p>
                         </div>
                     </div>

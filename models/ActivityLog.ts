@@ -5,6 +5,10 @@ export interface IActivityLog extends Document {
   entity: string
   entityId?: string
   details?: string
+  /** Who did it. Absent on entries written before admin accounts existed, and on
+   *  guest-triggered actions like a booking confirmation. */
+  actorId?: string
+  actorName?: string
   timestamp: Date
   createdAt: Date
   updatedAt: Date
@@ -16,6 +20,8 @@ const activityLogSchema = new Schema(
     entity: { type: String, required: true },
     entityId: { type: String, required: false },
     details: { type: String, required: false },
+    actorId: { type: String, required: false },
+    actorName: { type: String, required: false },
     timestamp: { type: Date, default: Date.now },
   },
   { timestamps: true }
