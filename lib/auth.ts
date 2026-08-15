@@ -1,7 +1,13 @@
 import { jwtVerify, SignJWT } from 'jose'
 import { NextRequest } from 'next/server'
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+// Without this guard a missing JWT_SECRET silently becomes the literal string
+// "undefined" — every token would then be signed with a publicly guessable key.
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not set. Refusing to start with an unsigned-token configuration.')
+}
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET)
 
 export async function verifyAdminToken(token: string) {
   const { payload } = await jwtVerify(token, secret)
