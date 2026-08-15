@@ -2,10 +2,18 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 // Vercel/Lambda cannot ship full `puppeteer` (~350MB with bundled Chrome) inside the
-// 250MB function limit, so serverless runs `puppeteer-core` against the compressed
-// Chromium binary from `@sparticuz/chromium`. Locally we use the `puppeteer` devDependency,
-// which brings its own browser.
+// 250MB function limit. `@sparticuz/chromium-min` keeps the bundle small by NOT
+// embedding the browser: it downloads the ~66MB pack at runtime and caches it in
+// /tmp, so only the first cold start pays for the fetch. Locally we use the
+// `puppeteer` devDependency, which brings its own browser.
 const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME)
+
+// Must match the installed @sparticuz/chromium-min version, and must be the x64
+// build — Vercel Functions run on x86_64. Overridable so the pack can be moved to
+// your own storage without a code change (GitHub is not a CDN).
+const CHROMIUM_PACK_URL =
+  process.env.CHROMIUM_PACK_URL ??
+  'https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.x64.tar'
 
 type LaunchTarget = {
   puppeteer: any
@@ -15,15 +23,20 @@ type LaunchTarget = {
 const getLaunchTarget = async (): Promise<LaunchTarget> => {
   if (isServerless) {
     const [{ default: chromium }, puppeteer] = await Promise.all([
-      import('@sparticuz/chromium'),
+      import('@sparticuz/chromium-min'),
       import('puppeteer-core'),
     ])
+
+    // WebGL/SwiftShader is dead weight for rendering an invoice and costs both
+    // memory and extraction time.
+    chromium.setGraphicsMode = false
 
     return {
       puppeteer: puppeteer.default ?? puppeteer,
       options: {
         args: chromium.args,
-        executablePath: await chromium.executablePath(),
+        // Unlike the full package, -min requires the pack URL explicitly.
+        executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
         headless: true,
       },
     }

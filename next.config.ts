@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  serverExternalPackages: ['mongoose', 'nodemailer', 'puppeteer-core', '@sparticuz/chromium', 'puppeteer'],
+  serverExternalPackages: ['mongoose', 'nodemailer', 'puppeteer-core', '@sparticuz/chromium-min', 'puppeteer'],
 }
 
 export default nextConfig
