@@ -14,11 +14,21 @@ const ADMIN_API = [
     /^\/api\/activity-log/,
 ]
 
+// Admin pages reachable without a session — the sign-in and account-recovery
+// flow itself. Everything else under /admin requires a valid cookie.
+const PUBLIC_ADMIN_PAGES = [
+    '/admin/login',
+    '/admin/signup',
+    '/admin/forgot-password',
+    '/admin/reset-password',
+    '/admin/verify-email',
+]
+
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // --- Protect admin pages (redirect to login if no valid cookie) ---
-    if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    if (pathname.startsWith('/admin') && !PUBLIC_ADMIN_PAGES.includes(pathname)) {
         const token = request.cookies.get('admin_token')?.value
         if (!token) return NextResponse.redirect(new URL('/admin/login', request.url))
         try {

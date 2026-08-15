@@ -5,7 +5,7 @@ import { connectDB } from '@/lib/db'
 import roomService from '@/services/room.service'
 import { uploadBuffer } from '@/lib/cloudinary'
 import ActivityLogService from '@/services/activityLog.service'
-import { verifyAdminToken } from '@/lib/auth'
+import { verifyAdminToken, adminActor } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
-    await verifyAdminToken(token)
+    const adminPayload = await verifyAdminToken(token)
 
     await connectDB()
     const formData = await request.formData()
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     await roomService.updateRoom(body, imageUrls)
-    await ActivityLogService.log('UPDATE_ROOM', 'Room', body.roomId, 'Room details updated')
+    await ActivityLogService.log('UPDATE_ROOM', 'Room', body.roomId, 'Room details updated', adminActor(adminPayload))
 
     return NextResponse.json({ success: true, message: 'Room successfully updated' })
   } catch (error: any) {
