@@ -24,9 +24,9 @@ export const BookingService = {
         }
     },
 
-    releaseTemporary: async (bookingId: string) => {
+    releaseTemporary: async (bookingId: string, holdToken: string) => {
         try {
-            const response = await apiClient.post('/booking/release', { bookingId });
+            const response = await apiClient.post('/booking/release', { bookingId, holdToken });
             return response.data;
         } catch {
             // fire-and-forget — don't surface this error to the user

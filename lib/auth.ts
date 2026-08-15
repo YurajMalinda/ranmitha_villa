@@ -54,6 +54,35 @@ export async function signAdminToken(
     .sign(secret)
 }
 
+/**
+ * Capability token for releasing a temporary hold.
+ *
+ * A hold is created before the guest identifies themselves (`user: null`), so
+ * there is no account to check ownership against. Instead the client that
+ * created the hold receives this token and must present it to release, which
+ * stops anyone else from cancelling a stranger's hold mid-checkout.
+ *
+ * Scoped to one booking and outliving the 15-minute hold by a small margin.
+ */
+export async function signHoldToken(bookingId: string) {
+  return new SignJWT({ bookingId, scope: 'hold' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('20m')
+    .sign(secret)
+}
+
+/** Returns the booking id the token authorises, or null if it does not apply. */
+export async function verifyHoldToken(token: string, bookingId: string) {
+  try {
+    const { payload } = await jwtVerify(token, secret)
+    if (payload.scope !== 'hold') return null
+    if (payload.bookingId !== bookingId) return null
+    return String(payload.bookingId)
+  } catch {
+    return null
+  }
+}
+
 export async function signUserToken(userId: string) {
   return new SignJWT({ id: userId })
     .setProtectedHeader({ alg: 'HS256' })

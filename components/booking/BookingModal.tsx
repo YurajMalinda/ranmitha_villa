@@ -44,19 +44,19 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
     const [holdExpiresAt, setHoldExpiresAt] = useState<number | null>(null);
     const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
 
-    // Mirrors heldBookingId so cleanup paths can release without stale closures.
-    const heldRef = useRef<string | null>(null);
-    heldRef.current = heldBookingId;
+    // Mirrors the hold so cleanup paths can release without stale closures.
+    const heldRef = useRef<{ id: string; token: string } | null>(null);
 
     const releaseHold = useCallback(() => {
-        const id = heldRef.current;
-        if (!id) return;
+        const held = heldRef.current;
+        if (!held) return;
         heldRef.current = null;
         setHeldBookingId(null);
         setHoldExpiresAt(null);
         setSecondsLeft(null);
         // Fire-and-forget: the TTL index reaps the hold anyway if this fails.
-        BookingService.releaseTemporary(id);
+        // The token proves this client placed the hold.
+        BookingService.releaseTemporary(held.id, held.token);
     }, []);
 
     useEffect(() => {
@@ -168,7 +168,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                 return;
             }
 
-            heldRef.current = reservation.booking_id;
+            heldRef.current = { id: reservation.booking_id, token: res.holdToken };
             setHeldBookingId(reservation.booking_id);
             setHoldExpiresAt(
                 reservation.expiresAt ? new Date(reservation.expiresAt).getTime() : Date.now() + 15 * 60 * 1000
