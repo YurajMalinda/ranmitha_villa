@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises'
 import nodemailer from 'nodemailer'
 import { generateInvoicePDF } from './pdf'
 
@@ -280,33 +281,63 @@ export const getAdminNotificationLetter = (reservation: any, room: any, user: an
 </html>
 `
 
+// Nodemailer streams the attachment off disk during sendMail, so the temp file is
+// only safe to remove once sending has settled. Never let cleanup fail a send.
+const discardTempPDF = async (pdfPath: string | null) => {
+  if (!pdfPath) return
+  try {
+    await fs.unlink(pdfPath)
+  } catch (err: any) {
+    if (err.code !== 'ENOENT') console.error(`Could not remove temp invoice ${pdfPath}:`, err.message)
+  }
+}
+
 class MailRepository {
   async booking(reservation: any, room: any, user: any, confirmLetter: Function, adminLetter: Function | null, invoiceTemplate: Function) {
-    const pdfPath = await generateInvoicePDF(
-      invoiceTemplate(reservation, room, user),
-      `invoice-${reservation['booking_id']}.pdf`
-    )
+    // The invoice PDF is a nice-to-have. If Chrome is unavailable (common on
+    // serverless) the confirmation email must still reach the guest.
+    let pdfPath: string | null = null
+    try {
+      pdfPath = await generateInvoicePDF(
+        invoiceTemplate(reservation, room, user),
+        `invoice-${reservation['booking_id']}.pdf`
+      )
+    } catch (err: any) {
+      console.error(`Invoice PDF generation failed for ${reservation['booking_id']}, sending email without attachment:`, err.message)
+    }
 
-    const guestInfo = await transporter.sendMail({
-      from: `"Ranmitha Villa" <${process.env.GMAIL}>`,
-      to: user['email'],
-      subject: 'Booking Confirmed - Your Stay at Ranmitha Villa',
-      html: typeof confirmLetter === 'function' ? confirmLetter(reservation, room, user) : confirmLetter,
-      attachments: [
-        {
-          filename: 'Booking-Invoice.pdf',
-          path: pdfPath,
-        },
-      ],
-    })
+    let guestInfo
+    try {
+      guestInfo = await transporter.sendMail({
+        from: `"Ranmitha Villa" <${process.env.GMAIL}>`,
+        to: user['email'],
+        subject: 'Booking Confirmed - Your Stay at Ranmitha Villa',
+        html: typeof confirmLetter === 'function' ? confirmLetter(reservation, room, user) : confirmLetter,
+        ...(pdfPath ? {
+          attachments: [
+            {
+              filename: 'Booking-Invoice.pdf',
+              path: pdfPath,
+            },
+          ],
+        } : {}),
+      })
+    } finally {
+      await discardTempPDF(pdfPath)
+    }
 
     if (adminLetter) {
-      await transporter.sendMail({
-        from: `"Ranmitha Villa System" <${process.env.GMAIL}>`,
-        to: process.env.GMAIL,
-        subject: `[New Booking] ${reservation['booking_id']} - ${user['firstname']}`,
-        html: typeof adminLetter === 'function' ? adminLetter(reservation, room, user, 'NEW') : adminLetter,
-      })
+      // Sent independently: a failed admin alert must not mask a delivered guest email.
+      try {
+        await transporter.sendMail({
+          from: `"Ranmitha Villa System" <${process.env.GMAIL}>`,
+          to: process.env.GMAIL,
+          subject: `[New Booking] ${reservation['booking_id']} - ${user['firstname']}`,
+          html: typeof adminLetter === 'function' ? adminLetter(reservation, room, user, 'NEW') : adminLetter,
+        })
+      } catch (err: any) {
+        console.error(`Admin notification failed for ${reservation['booking_id']}:`, err.message)
+      }
     }
 
     return guestInfo
@@ -315,34 +346,47 @@ class MailRepository {
   async cancel(reservation: any, room: any, user: any, cancelLetter: Function | string, adminLetter?: Function | null, invoiceTemplate?: Function) {
     let pdfPath: string | null = null
     if (invoiceTemplate) {
-      pdfPath = await generateInvoicePDF(
-        invoiceTemplate(reservation, room, user),
-        `cancelled-${reservation['booking_id']}.pdf`
-      )
+      try {
+        pdfPath = await generateInvoicePDF(
+          invoiceTemplate(reservation, room, user),
+          `cancelled-${reservation['booking_id']}.pdf`
+        )
+      } catch (err: any) {
+        console.error(`Cancellation PDF generation failed for ${reservation['booking_id']}, sending email without attachment:`, err.message)
+      }
     }
 
-    const guestInfo = await transporter.sendMail({
-      from: `"Ranmitha Villa" <${process.env.GMAIL}>`,
-      to: user['email'],
-      subject: 'Booking Cancelled - Ranmitha Villa',
-      html: typeof cancelLetter === 'function' ? cancelLetter(reservation, room, user) : cancelLetter,
-      ...(pdfPath ? {
-        attachments: [
-          {
-            filename: 'Booking-Cancelled.pdf',
-            path: pdfPath,
-          },
-        ],
-      } : {}),
-    })
+    let guestInfo
+    try {
+      guestInfo = await transporter.sendMail({
+        from: `"Ranmitha Villa" <${process.env.GMAIL}>`,
+        to: user['email'],
+        subject: 'Booking Cancelled - Ranmitha Villa',
+        html: typeof cancelLetter === 'function' ? cancelLetter(reservation, room, user) : cancelLetter,
+        ...(pdfPath ? {
+          attachments: [
+            {
+              filename: 'Booking-Cancelled.pdf',
+              path: pdfPath,
+            },
+          ],
+        } : {}),
+      })
+    } finally {
+      await discardTempPDF(pdfPath)
+    }
 
     if (adminLetter) {
-      await transporter.sendMail({
-        from: `"Ranmitha Villa System" <${process.env.GMAIL}>`,
-        to: process.env.GMAIL,
-        subject: `[Cancelled] ${reservation['booking_id']} - ${user['firstname']}`,
-        html: typeof adminLetter === 'function' ? adminLetter(reservation, room, user, 'CANCEL') : adminLetter,
-      })
+      try {
+        await transporter.sendMail({
+          from: `"Ranmitha Villa System" <${process.env.GMAIL}>`,
+          to: process.env.GMAIL,
+          subject: `[Cancelled] ${reservation['booking_id']} - ${user['firstname']}`,
+          html: typeof adminLetter === 'function' ? adminLetter(reservation, room, user, 'CANCEL') : adminLetter,
+        })
+      } catch (err: any) {
+        console.error(`Admin cancellation notification failed for ${reservation['booking_id']}:`, err.message)
+      }
     }
 
     return guestInfo
