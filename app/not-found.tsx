@@ -1,4 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+    title: 'Page Not Found | Ranmitha Villa Weligama',
+    description: 'The page you were looking for could not be found. Return to Ranmitha Villa — boutique villa 200m from Weligama Beach, Sri Lanka.',
+    robots: { index: false, follow: false },
+};
 
 export default function NotFound() {
     return (
