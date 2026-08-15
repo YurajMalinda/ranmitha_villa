@@ -61,13 +61,12 @@ export default function LoginPage() {
                     </label>
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        {/* Deliberately type="text", not type="email": the recovery
-                            credential is a plain username, and native email validation
-                            would block it from ever being submitted. */}
+                        {/* Every credential that can sign in here is an email address,
+                            including ADMIN_USERNAME — see the guard in
+                            adminAuth.service.ts that enforces it. */}
                         <input
                             id="email"
-                            type="text"
-                            inputMode="email"
+                            type="email"
                             autoComplete="username"
                             required
                             className={authInputClass}

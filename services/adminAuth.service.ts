@@ -72,6 +72,12 @@ const adminAuthService = {
       throw new AppError('This email address is not permitted to create an admin account.', 403)
     }
 
+    // Sign-in checks admin accounts before the master key, so an account sharing
+    // the recovery address would shadow it and there would be no way back in.
+    if (process.env.ADMIN_USERNAME && email === normaliseEmail(process.env.ADMIN_USERNAME)) {
+      throw new AppError('This email address is reserved. Use a different one.', 403)
+    }
+
     const existing = await Admin.findOne({ email })
 
     if (existing) {
@@ -176,6 +182,17 @@ const adminAuthService = {
     const plaintext = process.env.ADMIN_PASSWORD
 
     if (!expectedUsername || (!passwordHash && !plaintext)) return null
+
+    // The sign-in field is type="email", so the browser will not submit anything
+    // without an "@" — a non-email ADMIN_USERNAME is unreachable through the form.
+    if (!expectedUsername.includes('@')) {
+      console.error(
+        `[SECURITY] ADMIN_USERNAME ("${expectedUsername}") is not an email address. ` +
+          `The sign-in form cannot submit it, so the recovery credential is unusable. ` +
+          `Set it to an email address.`
+      )
+      return null
+    }
 
     const usernameOk = safeEquals(username, normaliseEmail(expectedUsername))
     const passwordOk = passwordHash
