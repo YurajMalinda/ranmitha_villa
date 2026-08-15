@@ -61,9 +61,8 @@ export default function LoginPage() {
                     </label>
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        {/* Every credential that can sign in here is an email address,
-                            including ADMIN_USERNAME — see the guard in
-                            adminAuth.service.ts that enforces it. */}
+                        {/* Every credential that can sign in here is an email address;
+                            the server enforces that. */}
                         <input
                             id="email"
                             type="email"

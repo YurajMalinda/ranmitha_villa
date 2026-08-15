@@ -66,16 +66,19 @@ const adminAuthService = {
       throw new AppError('Admin sign-up is not configured.', 500)
     }
 
-    // Rejected before any account is written, so the collection never fills with
-    // sign-up attempts from people who could not use them anyway.
-    if (!isAllowedEmail(email)) {
-      throw new AppError('This email address is not permitted to create an admin account.', 403)
-    }
-
     // Sign-in checks admin accounts before the master key, so an account sharing
     // the recovery address would shadow it and there would be no way back in.
-    if (process.env.ADMIN_USERNAME && email === normaliseEmail(process.env.ADMIN_USERNAME)) {
-      throw new AppError('This email address is reserved. Use a different one.', 403)
+    const isRecoveryAddress =
+      !!process.env.ADMIN_USERNAME && email === normaliseEmail(process.env.ADMIN_USERNAME)
+
+    // Both rejections use one message on purpose. A distinct "this address is
+    // reserved" would confirm to anyone probing sign-up that they had guessed
+    // the recovery credential's address.
+    if (!isAllowedEmail(email) || isRecoveryAddress) {
+      if (isRecoveryAddress) {
+        console.warn('[SECURITY] Sign-up attempted on the recovery address; rejected.')
+      }
+      throw new AppError('This email address is not permitted to create an admin account.', 403)
     }
 
     const existing = await Admin.findOne({ email })
@@ -187,7 +190,8 @@ const adminAuthService = {
     // without an "@" — a non-email ADMIN_USERNAME is unreachable through the form.
     if (!expectedUsername.includes('@')) {
       console.error(
-        `[SECURITY] ADMIN_USERNAME ("${expectedUsername}") is not an email address. ` +
+        // The value itself is not logged — logs are retained and often shared.
+        `[SECURITY] ADMIN_USERNAME is not an email address. ` +
           `The sign-in form cannot submit it, so the recovery credential is unusable. ` +
           `Set it to an email address.`
       )
@@ -202,7 +206,9 @@ const adminAuthService = {
     if (!usernameOk || !passwordOk) return null
 
     console.warn(
-      `[SECURITY] Master key sign-in used for "${username}". This bypasses admin accounts — ` +
+      // Deliberately does not include the address: a successful master sign-in
+      // means this equals the recovery credential, and logs are retained.
+      `[SECURITY] Master key sign-in used. This bypasses admin accounts — ` +
         `use it only for recovery.`
     )
 

@@ -76,7 +76,7 @@ export default function SignUpPage() {
                     <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input id="name" type="text" required autoComplete="name" className={authInputClass}
-                            placeholder="Yuraj Malinda" value={form.name} onChange={set('name')} />
+                            placeholder="Your full name" value={form.name} onChange={set('name')} />
                     </div>
                 </div>
 
