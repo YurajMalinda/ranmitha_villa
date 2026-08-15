@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Users, Check, Calendar, Loader2, AlertCircle, PartyPopper, ChevronLeft } from 'lucide-react';
+import { X, Users, Check, Calendar, Clock, Loader2, AlertCircle, PartyPopper, ChevronLeft } from 'lucide-react';
 import { BookingService } from '@/services/frontend/booking.service';
 import { ConfirmationPayload } from '@/types/api';
 import { DateRangePicker } from '@/components/ui/DateRangePicker';
@@ -38,6 +38,27 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
     const [guestDetails, setGuestDetails] = useState({ firstname: '', lastname: '', email: '', mobile: '', country: '' });
     const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
 
+    // The room is held server-side while the guest fills in their details, so a
+    // second guest cannot take it out from under them mid-form.
+    const [heldBookingId, setHeldBookingId] = useState<string | null>(null);
+    const [holdExpiresAt, setHoldExpiresAt] = useState<number | null>(null);
+    const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+
+    // Mirrors heldBookingId so cleanup paths can release without stale closures.
+    const heldRef = useRef<string | null>(null);
+    heldRef.current = heldBookingId;
+
+    const releaseHold = useCallback(() => {
+        const id = heldRef.current;
+        if (!id) return;
+        heldRef.current = null;
+        setHeldBookingId(null);
+        setHoldExpiresAt(null);
+        setSecondsLeft(null);
+        // Fire-and-forget: the TTL index reaps the hold anyway if this fails.
+        BookingService.releaseTemporary(id);
+    }, []);
+
     useEffect(() => {
         if (isOpen) {
             setStep('dates');
@@ -48,8 +69,38 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
             setConfirmedBookingId(null);
             setError(null);
             setGuestDetails({ firstname: '', lastname: '', email: '', mobile: '', country: '' });
+        } else {
+            // Closed mid-flow: hand the room back rather than making the next
+            // guest wait out the TTL.
+            releaseHold();
         }
-    }, [isOpen]);
+    }, [isOpen, releaseHold]);
+
+    // Tick the hold countdown; expire the hold in place when it runs out.
+    useEffect(() => {
+        if (!holdExpiresAt) return;
+
+        const tick = () => {
+            const remaining = Math.ceil((holdExpiresAt - Date.now()) / 1000);
+            if (remaining <= 0) {
+                heldRef.current = null;
+                setHeldBookingId(null);
+                setHoldExpiresAt(null);
+                setSecondsLeft(null);
+                setSelectedRoom(null);
+                setAvailableRooms([]);
+                setDirection(-1);
+                setStep('dates');
+                setError('Your hold expired. Please search again — the villa may still be available.');
+                return;
+            }
+            setSecondsLeft(remaining);
+        };
+
+        tick();
+        const timer = setInterval(tick, 1000);
+        return () => clearInterval(timer);
+    }, [holdExpiresAt]);
 
     // Lock body scroll + Escape to close
     useEffect(() => {
@@ -99,11 +150,37 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
         }
     };
 
-    const handleReserveRoom = () => {
-        if (!selectedRoom) return;
+    const handleReserveRoom = async () => {
+        if (!selectedRoom || !dateRange?.from || !dateRange?.to) return;
         setError(null);
-        setDirection(1);
-        setStep('details');
+        setIsLoading(true);
+        try {
+            const res = await BookingService.checkAvailability({
+                roomId: selectedRoom._id,
+                check_in_date: format(dateRange.from, 'yyyy-MM-dd'),
+                check_out_date: format(dateRange.to, 'yyyy-MM-dd'),
+                guests,
+            });
+
+            const reservation = res?.reservation;
+            if (!res?.success || !reservation?.booking_id) {
+                setError(res?.message || 'Could not hold this villa. Please try again.');
+                return;
+            }
+
+            heldRef.current = reservation.booking_id;
+            setHeldBookingId(reservation.booking_id);
+            setHoldExpiresAt(
+                reservation.expiresAt ? new Date(reservation.expiresAt).getTime() : Date.now() + 15 * 60 * 1000
+            );
+            setDirection(1);
+            setStep('details');
+        } catch (e: any) {
+            // 409 from the availability check inside the reservation transaction.
+            setError(e.message || 'This villa was just taken for those dates. Please pick another.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleConfirmBooking = async () => {
@@ -120,6 +197,8 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
         setIsLoading(true);
         try {
             const payload: ConfirmationPayload = {
+                // Confirms the existing hold instead of racing for the room again.
+                ...(heldBookingId ? { bookingId: heldBookingId } : {}),
                 roomId: selectedRoom._id,
                 check_in_date: format(dateRange.from, 'yyyy-MM-dd'),
                 check_out_date: format(dateRange.to, 'yyyy-MM-dd'),
@@ -128,6 +207,11 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                 urlHash: 'booking',
             };
             const res = await BookingService.confirmBooking(payload);
+            // The hold is now a confirmed booking — must not be released.
+            heldRef.current = null;
+            setHeldBookingId(null);
+            setHoldExpiresAt(null);
+            setSecondsLeft(null);
             setConfirmedBookingId(res.booking_id);
             setDirection(1);
             setStep('confirmation');
@@ -143,8 +227,10 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
     const handleBack = useCallback(() => {
         setError(null);
         setDirection(-1);
+        // Leaving the details step abandons the checkout — give the room back now.
+        if (step === 'details') releaseHold();
         setStep(step === 'room' ? 'dates' : 'room');
-    }, [step]);
+    }, [step, releaseHold]);
 
     return (
         <AnimatePresence>
@@ -386,6 +472,19 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                     transition={{ duration: 0.22, ease: 'easeInOut' }}
                                 >
                                     <div className="space-y-4">
+                                        {/* Hold countdown */}
+                                        {secondsLeft !== null && (
+                                            <div className="flex items-center justify-center gap-2 text-xs bg-[#D4784A]/10 border border-[#D4784A]/20 text-[#B85F30] rounded-lg py-2 px-3">
+                                                <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                                                <span>
+                                                    We&apos;re holding this villa for{' '}
+                                                    <strong className="tabular-nums">
+                                                        {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}
+                                                    </strong>
+                                                </span>
+                                            </div>
+                                        )}
+
                                         {/* Stay summary */}
                                         <div className="bg-[#2E5D4B]/5 border border-[#2E5D4B]/10 rounded-xl p-4 space-y-1.5">
                                             <h4 className="font-semibold text-[#2E5D4B] text-sm flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Your Stay</h4>
