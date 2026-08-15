@@ -61,10 +61,14 @@ export default function LoginPage() {
                     </label>
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        {/* Deliberately type="text", not type="email": the recovery
+                            credential is a plain username, and native email validation
+                            would block it from ever being submitted. */}
                         <input
                             id="email"
-                            type="email"
-                            autoComplete="email"
+                            type="text"
+                            inputMode="email"
+                            autoComplete="username"
                             required
                             className={authInputClass}
                             placeholder="you@example.com"
