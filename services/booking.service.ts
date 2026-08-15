@@ -184,21 +184,41 @@ class BookingService {
         </html>
       `
 
-      try {
-        await mailRepository.booking(booking, room, user, confirmLetter, getAdminNotificationLetter, getInvoiceTemplate)
-        console.log(`Email sent successfully for booking ${booking.booking_id}`)
-      } catch (emailError: any) {
-        console.error(`Email sending failed for booking ${booking.booking_id}:`, emailError.message)
-        console.error(emailError)
-      }
-
+      // The email is NOT sent here. Rendering the invoice PDF costs ~2.5s and the
+      // full send ~9s, which alone can exhaust a serverless function timeout and
+      // fail a booking that was already written. The route schedules
+      // sendConfirmationEmail() via after() so the guest gets their response
+      // immediately.
       const confirmedBooking = {
         token: registeredUser?.token || 'already have token',
         booking_id: booking.booking_id,
+        email: { booking, room, user, confirmLetter },
       }
       return confirmedBooking
     } catch (error: any) {
       throw new AppError(`Can't change reservation status or reserve room: ${error.message}`, error.statusCode || 500)
+    }
+  }
+
+  /**
+   * Sends the guest confirmation + admin alert for an already-persisted booking.
+   * Intended to run via next/server `after()`, off the request path. Never
+   * throws: the booking is already committed, so a mail failure must not
+   * surface as a request error.
+   */
+  async sendConfirmationEmail(payload: {
+    booking: any
+    room: any
+    user: any
+    confirmLetter: (res: any, rm: any, usr: any) => string
+  }) {
+    const { booking, room, user, confirmLetter } = payload
+    try {
+      await mailRepository.booking(booking, room, user, confirmLetter, getAdminNotificationLetter, getInvoiceTemplate)
+      console.log(`Email sent successfully for booking ${booking.booking_id}`)
+    } catch (emailError: any) {
+      console.error(`Email sending failed for booking ${booking.booking_id}:`, emailError.message)
+      console.error(emailError)
     }
   }
 

@@ -6,7 +6,7 @@ export const navbarData: NavbarData = {
         { name: 'Home', href: '#home' },
         { name: 'Villas', href: '#rooms' },
         { name: 'Gallery', href: '#gallery' },
-        { name: 'Tours', href: '#tours' },
+        { name: 'Tours', href: '#experiences' },
         { name: 'Location', href: '#location' },
         { name: 'Reviews', href: '#reviews' }
     ],

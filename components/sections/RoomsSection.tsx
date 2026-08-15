@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Bed, Users, Maximize, Check } from 'lucide-react';
 import { roomsData } from '@/data/rooms';
 import { RoomService } from '@/services/frontend/room.service';
+import { useBooking } from '@/components/booking/BookingContext';
 
 interface ApiRoom {
     _id: string;
@@ -22,11 +23,8 @@ interface ApiRoom {
     status: string;
 }
 
-interface RoomsSectionProps {
-    onOpenBooking?: () => void;
-}
-
-export function RoomsSection({ onOpenBooking }: RoomsSectionProps) {
+export function RoomsSection() {
+    const { openBooking } = useBooking();
     const { title, description } = roomsData;
     const [rooms, setRooms] = useState<ApiRoom[]>([]);
     const [loading, setLoading] = useState(true);
@@ -167,7 +165,7 @@ export function RoomsSection({ onOpenBooking }: RoomsSectionProps) {
                                     )}
 
                                     <button
-                                        onClick={onOpenBooking}
+                                        onClick={openBooking}
                                         className="block w-full bg-[#2E5D4B] hover:bg-[#1E4A3A] text-white text-center py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-[#2E5D4B]/20 active:scale-[0.98]">
                                         Check Availability
                                     </button>

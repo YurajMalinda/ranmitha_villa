@@ -1,12 +1,46 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
+@theme {
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-lato), system-ui, sans-serif;
+}
+
 /* Tailwind v4: override dark variant to use .dark class instead of media query */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
     body {
         @apply antialiased text-gray-900 bg-white dark:bg-slate-900 dark:text-white transition-colors duration-200;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* The navbar is fixed at h-16 (4rem); without this, anchor links park each
+       section's heading underneath it. */
+    [id] {
+        scroll-margin-top: 5rem;
+    }
+}
+
+/* Respect the OS "reduce motion" setting: kill parallax, infinite pulses and
+   scroll animation for users who asked for stillness. Framer Motion is handled
+   separately by <MotionConfig reducedMotion="user"> in MotionProvider. */
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
