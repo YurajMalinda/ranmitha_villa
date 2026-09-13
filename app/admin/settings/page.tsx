@@ -1,7 +1,130 @@
 'use client'
 
-import React from 'react';
-import { Shield, Server, Lock, Info } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Shield, Server, Lock, Info, UserPlus, Loader2, Mail, CheckCircle2, Clock } from 'lucide-react';
+import { authInputClass, authButtonClass } from '@/components/admin/AuthShell';
+
+type AdminRow = {
+    _id: string;
+    email: string;
+    name: string;
+    isActive: boolean;
+    emailVerified: boolean;
+    lastLoginAt?: string;
+    createdAt: string;
+};
+
+function AdminTeamCard() {
+    const [admins, setAdmins] = useState<AdminRow[]>([]);
+    const [loadingList, setLoadingList] = useState(true);
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
+
+    const loadAdmins = async () => {
+        setLoadingList(true);
+        try {
+            const res = await fetch('/api/admin/list');
+            const data = await res.json();
+            if (res.ok && data.success) setAdmins(data.admins);
+        } finally {
+            setLoadingList(false);
+        }
+    };
+
+    useEffect(() => { loadAdmins(); }, []);
+
+    const handleInvite = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setNotice(null);
+        setSending(true);
+        try {
+            const res = await fetch('/api/admin/invite', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ email, name }),
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setNotice(data.message);
+                setEmail('');
+                setName('');
+                loadAdmins();
+            } else {
+                setError(data.message || 'Could not send invite.');
+            }
+        } catch {
+            setError('Could not reach the server. Please try again.');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    return (
+        <div className="admin-card p-6 md:col-span-2">
+            <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <UserPlus size={24} />
+                </div>
+                <div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Admin Team</h3>
+                    <p className="text-sm text-gray-500">Invite other admins — no server configuration needed</p>
+                </div>
+            </div>
+
+            <form onSubmit={handleInvite} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 mb-6">
+                <input
+                    type="text" required placeholder="Name" className={authInputClass}
+                    value={name} onChange={(e) => setName(e.target.value)}
+                />
+                <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                        type="email" required placeholder="Email address" className={authInputClass}
+                        value={email} onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                <button type="submit" disabled={sending} className={`${authButtonClass} sm:w-auto sm:px-6`}>
+                    {sending ? <Loader2 size={18} className="animate-spin" /> : 'Invite'}
+                </button>
+            </form>
+
+            {error && (
+                <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-4">{error}</div>
+            )}
+            {notice && (
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 p-3 rounded-lg text-sm mb-4">{notice}</div>
+            )}
+
+            {loadingList ? (
+                <div className="flex justify-center py-6"><Loader2 className="animate-spin text-gray-400" /></div>
+            ) : (
+                <div className="space-y-2">
+                    {admins.map((a) => (
+                        <div key={a._id} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-slate-800 last:border-0">
+                            <div>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{a.name}</p>
+                                <p className="text-xs text-gray-500">{a.email}</p>
+                            </div>
+                            {a.emailVerified ? (
+                                <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                                    <CheckCircle2 size={14} /> Active
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-1 text-xs font-medium text-amber-600">
+                                    <Clock size={14} /> Invite pending
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
 
 function SettingsContent() {
     return (
@@ -32,8 +155,8 @@ function SettingsContent() {
                                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Authentication</span>
                             </div>
                             <p className="text-sm text-gray-700 dark:text-gray-300">
-                                This admin account is managed via server environment variables.
-                                Password changes must be done by updating the server configuration.
+                                Admin accounts are stored in the database. Invite new admins below —
+                                the environment-configured account is a break-glass fallback only.
                             </p>
                         </div>
                     </div>
@@ -72,6 +195,8 @@ function SettingsContent() {
                         <p>For advanced configuration changes, please contact the development team.</p>
                     </div>
                 </div>
+
+                <AdminTeamCard />
             </div>
         </div>
     );

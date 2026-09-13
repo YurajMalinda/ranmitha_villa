@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Types } from 'mongoose'
 
-export type AuthTokenPurpose = 'verify-email' | 'reset-password'
+export type AuthTokenPurpose = 'reset-password' | 'invite'
 
 export interface IAuthToken extends Document {
   admin: Types.ObjectId
@@ -17,7 +17,7 @@ const authTokenSchema = new Schema(
   {
     admin: { type: Schema.Types.ObjectId, ref: 'admin', required: true, index: true },
     tokenHash: { type: String, required: true, unique: true },
-    purpose: { type: String, required: true, enum: ['verify-email', 'reset-password'] },
+    purpose: { type: String, required: true, enum: ['reset-password', 'invite'] },
     expiresAt: { type: Date, required: true },
     usedAt: { type: Date, required: false },
   },

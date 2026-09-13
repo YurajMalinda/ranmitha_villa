@@ -38,18 +38,18 @@ const shell = (heading: string, body: string, cta: { label: string; href: string
   </td></tr></table>
 </body></html>`
 
-export async function sendVerificationEmail(to: string, name: string, rawToken: string) {
-  const href = `${siteUrl()}/admin/verify-email?token=${encodeURIComponent(rawToken)}`
+export async function sendInviteEmail(to: string, name: string, rawToken: string) {
+  const href = `${siteUrl()}/admin/accept-invite?token=${encodeURIComponent(rawToken)}`
   await transporter.sendMail({
     from: `"Ranmitha Villa Admin" <${process.env.GMAIL}>`,
     to,
-    subject: 'Confirm your Ranmitha Villa admin account',
+    subject: 'You have been invited to Ranmitha Villa Admin',
     html: shell(
-      'Confirm your email',
+      "You're invited",
       `<p style="margin:0 0 12px;">Hi ${name},</p>
-       <p style="margin:0;line-height:1.6;">An admin account was created for this address. Confirm it to activate your access.</p>`,
-      { label: 'Confirm email', href },
-      'This link expires in 24 hours. If you did not request it, ignore this email.'
+       <p style="margin:0;line-height:1.6;">You have been invited to manage Ranmitha Villa's admin dashboard. Choose a password to activate your account.</p>`,
+      { label: 'Accept invite', href },
+      'This link expires in 7 days and can be used once. If you were not expecting this, ignore this email.'
     ),
   })
 }

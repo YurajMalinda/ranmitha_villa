@@ -3,12 +3,12 @@
 import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { KeyRound, Lock, Loader2 } from 'lucide-react';
+import { UserPlus, Lock, Loader2 } from 'lucide-react';
 import { AuthShell, authInputClass, authButtonClass } from '@/components/admin/AuthShell';
 
 const MIN_PASSWORD = 8;
 
-function ResetPasswordForm() {
+function AcceptInviteForm() {
     const token = useSearchParams().get('token') ?? '';
     const router = useRouter();
     const [password, setPassword] = useState('');
@@ -32,7 +32,7 @@ function ResetPasswordForm() {
 
         setLoading(true);
         try {
-            const res = await fetch('/api/auth/reset-password', {
+            const res = await fetch('/api/auth/accept-invite', {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 body: JSON.stringify({ token, password }),
@@ -42,7 +42,7 @@ function ResetPasswordForm() {
                 setNotice(`${data.message} Redirecting to sign in…`);
                 setTimeout(() => router.push('/admin/login'), 2000);
             } else {
-                setError(data.message || 'Could not reset the password.');
+                setError(data.message || 'Could not activate the account.');
             }
         } catch {
             setError('Could not reach the server. Please try again.');
@@ -54,13 +54,13 @@ function ResetPasswordForm() {
     if (!token) {
         return (
             <AuthShell
-                icon={<KeyRound size={24} />}
-                title="Reset Password"
+                icon={<UserPlus size={24} />}
+                title="Accept Invite"
                 subtitle="Something is missing"
-                error="This link is incomplete. Request a new reset email."
+                error="This link is incomplete. Ask whoever invited you to send a new one."
                 footer={
-                    <Link href="/admin/forgot-password" className="text-emerald-600 hover:underline font-medium">
-                        Request a new link
+                    <Link href="/admin/login" className="text-emerald-600 hover:underline font-medium">
+                        Back to sign in
                     </Link>
                 }
             >
@@ -71,9 +71,9 @@ function ResetPasswordForm() {
 
     return (
         <AuthShell
-            icon={<KeyRound size={24} />}
-            title="Choose a New Password"
-            subtitle="This link can only be used once"
+            icon={<UserPlus size={24} />}
+            title="Welcome to Ranmitha Villa Admin"
+            subtitle="Choose a password to activate your account"
             error={error}
             notice={notice}
             footer={
@@ -85,7 +85,7 @@ function ResetPasswordForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        New Password *
+                        Password *
                     </label>
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -99,7 +99,7 @@ function ResetPasswordForm() {
 
                 <div>
                     <label htmlFor="confirm" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Confirm New Password *
+                        Confirm Password *
                     </label>
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -109,17 +109,17 @@ function ResetPasswordForm() {
                 </div>
 
                 <button type="submit" disabled={loading} className={authButtonClass}>
-                    {loading ? <Loader2 size={20} className="animate-spin" /> : 'Update Password'}
+                    {loading ? <Loader2 size={20} className="animate-spin" /> : 'Activate Account'}
                 </button>
             </form>
         </AuthShell>
     );
 }
 
-export default function ResetPasswordPage() {
+export default function AcceptInvitePage() {
     return (
         <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-slate-950" />}>
-            <ResetPasswordForm />
+            <AcceptInviteForm />
         </Suspense>
     );
 }

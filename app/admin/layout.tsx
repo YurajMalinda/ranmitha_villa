@@ -11,10 +11,9 @@ import { AdminLayout } from '@/components/admin/AdminLayout'
 // (which redirects to login and fetches admin-only data).
 const PUBLIC_ADMIN_PAGES = [
     '/admin/login',
-    '/admin/signup',
     '/admin/forgot-password',
     '/admin/reset-password',
-    '/admin/verify-email',
+    '/admin/accept-invite',
 ]
 
 function AdminShell({ children }: { children: React.ReactNode }) {

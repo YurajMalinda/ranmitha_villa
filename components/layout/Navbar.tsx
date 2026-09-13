@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, MessageCircle, Calendar } from 'lucide-react';
 import { navbarData } from '@/data/navbar';
 import { useBooking } from '@/components/booking/BookingContext';
+import { CurrencySelector } from '@/components/layout/CurrencySelector';
 
 export function Navbar() {
   const { openBooking } = useBooking();
@@ -56,6 +57,8 @@ export function Navbar() {
 
           {/* CTA */}
           <div className="hidden lg:flex items-center gap-3">
+            <CurrencySelector light={!isScrolled} />
+
             {/* WhatsApp (Secondary) */}
             <a
               href={contact.whatsapp.href}
@@ -136,6 +139,10 @@ export function Navbar() {
                   )}
                 </div>
                 <div className="p-4 border-t border-gray-100 space-y-3">
+                  <div className="flex justify-center">
+                    <CurrencySelector />
+                  </div>
+
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);

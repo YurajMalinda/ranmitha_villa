@@ -4,8 +4,8 @@ import { connectDB } from '@/lib/db'
 import Admin from '@/models/Admin'
 import AuthToken from '@/models/AuthToken'
 import { issueToken, consumeToken } from '@/lib/auth-tokens'
-import { isAllowedEmail, normaliseEmail, allowlistConfigured } from '@/lib/allowlist'
-import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/auth-mail'
+import { normaliseEmail } from '@/lib/normalise-email'
+import { sendPasswordResetEmail, sendInviteEmail } from '@/lib/auth-mail'
 import { signAdminToken } from '@/lib/auth'
 
 export class AppError extends Error {
@@ -17,7 +17,7 @@ export class AppError extends Error {
 }
 
 const BCRYPT_COST = 12
-export const MIN_PASSWORD_LENGTH = 12
+export const MIN_PASSWORD_LENGTH = 8
 
 /** A bcrypt comparison against a throwaway hash, so an unknown email costs the
  *  same as a wrong password and accounts cannot be enumerated by timing. */
@@ -47,11 +47,10 @@ export function assertPasswordStrength(password: string) {
 
 const adminAuthService = {
   /**
-   * Creates an unverified account behind the allowlist, then emails a
-   * verification link. Callers must respond identically whether or not the
-   * address already existed, so this never signals account existence.
+   * Adds an admin at the invitation of another signed-in admin. This is now
+   * the only way to create an admin account — public self-signup was removed.
    */
-  async signUp(input: { email: string; name: string; password: string }) {
+  async inviteAdmin(input: { email: string; name: string }) {
     await connectDB()
 
     const email = normaliseEmail(input.email)
@@ -59,67 +58,62 @@ const adminAuthService = {
 
     if (!email.includes('@')) throw new AppError('Enter a valid email address.', 400)
     if (!name) throw new AppError('Name is required.', 400)
-    assertPasswordStrength(input.password)
 
-    if (!allowlistConfigured()) {
-      console.error('[SECURITY] ADMIN_ALLOWED_EMAILS is not set — refusing all admin sign-ups.')
-      throw new AppError('Admin sign-up is not configured.', 500)
-    }
-
-    // Sign-in checks admin accounts before the master key, so an account sharing
-    // the recovery address would shadow it and there would be no way back in.
-    const isRecoveryAddress =
-      !!process.env.ADMIN_USERNAME && email === normaliseEmail(process.env.ADMIN_USERNAME)
-
-    // Both rejections use one message on purpose. A distinct "this address is
-    // reserved" would confirm to anyone probing sign-up that they had guessed
-    // the recovery credential's address.
-    if (!isAllowedEmail(email) || isRecoveryAddress) {
-      if (isRecoveryAddress) {
-        console.warn('[SECURITY] Sign-up attempted on the recovery address; rejected.')
-      }
-      throw new AppError('This email address is not permitted to create an admin account.', 403)
+    // Same shadowing hazard as sign-up: an admin row at this address would
+    // hide the recovery credential behind a password nobody holds.
+    if (process.env.ADMIN_USERNAME && email === normaliseEmail(process.env.ADMIN_USERNAME)) {
+      throw new AppError('This address is reserved and cannot be added as an admin.', 400)
     }
 
     const existing = await Admin.findOne({ email })
 
     if (existing) {
-      // Unverified and stale: let them retry rather than locking the address out.
-      if (!existing.emailVerified) {
-        existing.name = name
-        existing.passwordHash = await bcrypt.hash(input.password, BCRYPT_COST)
-        await existing.save()
-        const raw = await issueToken(String(existing._id), 'verify-email')
-        await sendVerificationEmail(email, name, raw)
-        return { created: true }
+      if (existing.emailVerified) {
+        throw new AppError('This email address already has an admin account.', 409)
       }
-      // Already a real account — say nothing new, and do not touch the password.
-      return { created: false }
+      // Unaccepted invite: resend rather than blocking the inviter.
+      existing.name = name
+      await existing.save()
+      const raw = await issueToken(String(existing._id), 'invite')
+      await sendInviteEmail(email, name, raw)
+      return { created: false, reinvited: true }
     }
 
+    // No password is set here — the invitee chooses one when the invite is
+    // accepted, so this placeholder must never be reachable by any login path.
+    const placeholder = await bcrypt.hash(crypto.randomBytes(32).toString('hex'), BCRYPT_COST)
     const admin = await Admin.create({
       email,
       name,
-      passwordHash: await bcrypt.hash(input.password, BCRYPT_COST),
+      passwordHash: placeholder,
       emailVerified: false,
       isActive: true,
     })
 
-    const raw = await issueToken(String(admin._id), 'verify-email')
-    await sendVerificationEmail(email, name, raw)
+    const raw = await issueToken(String(admin._id), 'invite')
+    await sendInviteEmail(email, name, raw)
 
     return { created: true }
   },
 
-  async verifyEmail(rawToken: string) {
+  async listAdmins() {
+    await connectDB()
+    return Admin.find().sort({ createdAt: -1 })
+  },
+
+  async acceptInvite(rawToken: string, password: string) {
     await connectDB()
 
-    const adminId = await consumeToken(rawToken, 'verify-email')
-    if (!adminId) throw new AppError('This confirmation link is invalid or has expired.', 400)
+    assertPasswordStrength(password)
+
+    const adminId = await consumeToken(rawToken, 'invite')
+    if (!adminId) throw new AppError('This invite link is invalid or has expired.', 400)
 
     const admin = await Admin.findById(adminId)
-    if (!admin) throw new AppError('This confirmation link is invalid or has expired.', 400)
+    if (!admin) throw new AppError('This invite link is invalid or has expired.', 400)
+    if (admin.emailVerified) throw new AppError('This invite has already been used.', 400)
 
+    admin.passwordHash = await bcrypt.hash(password, BCRYPT_COST)
     admin.emailVerified = true
     await admin.save()
 

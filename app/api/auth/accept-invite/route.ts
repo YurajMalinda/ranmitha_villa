@@ -9,28 +9,26 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB()
 
-    const limit = await rateLimitShared(`signup:${clientIp(request)}`, 5, 60 * 60 * 1000)
+    const limit = await rateLimitShared(`accept-invite:${clientIp(request)}`, 10, 60 * 60 * 1000)
     if (!limit.allowed) {
       return NextResponse.json(
-        { success: false, message: 'Too many sign-up attempts. Please try again later.' },
+        { success: false, message: 'Too many attempts. Please try again later.' },
         { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } }
       )
     }
 
-    const { email, name, password } = await request.json()
-    await adminAuthService.signUp({ email, name, password })
+    const { token, password } = await request.json()
+    await adminAuthService.acceptInvite(token, password)
 
-    // Deliberately identical whether the account was created or already existed,
-    // so this cannot be used to discover which addresses are registered.
     return NextResponse.json({
       success: true,
-      message: 'Check your inbox for a confirmation link to activate your account.',
+      message: 'Account activated. You can sign in now.',
     })
   } catch (error: any) {
     if (error instanceof AppError) {
       return NextResponse.json({ success: false, message: error.message }, { status: error.statusCode })
     }
-    console.error('Admin sign-up failed:', error)
-    return NextResponse.json({ success: false, message: 'Could not complete sign-up.' }, { status: 500 })
+    console.error('Accept invite failed:', error)
+    return NextResponse.json({ success: false, message: 'Could not activate the account.' }, { status: 500 })
   }
 }

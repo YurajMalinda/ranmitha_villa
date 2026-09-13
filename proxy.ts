@@ -12,16 +12,16 @@ const ADMIN_API = [
     /^\/api\/block\/(create|update|disable)/,
     /^\/api\/notifications/,
     /^\/api\/activity-log/,
+    /^\/api\/admin\/(invite|list)/,
 ]
 
 // Admin pages reachable without a session — the sign-in and account-recovery
 // flow itself. Everything else under /admin requires a valid cookie.
 const PUBLIC_ADMIN_PAGES = [
     '/admin/login',
-    '/admin/signup',
     '/admin/forgot-password',
     '/admin/reset-password',
-    '/admin/verify-email',
+    '/admin/accept-invite',
 ]
 
 export async function proxy(request: NextRequest) {

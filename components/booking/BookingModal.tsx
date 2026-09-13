@@ -9,6 +9,8 @@ import { ConfirmationPayload } from '@/types/api';
 import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { DateRange } from '@/components/ui/DateRangePicker';
 import { format, differenceInCalendarDays } from 'date-fns';
+import { useCurrency } from '@/components/providers/CurrencyContext';
+import { BASE_CURRENCY } from '@/lib/currency';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -27,6 +29,7 @@ const STEPS: { key: Step; label: string }[] = [
 ];
 
 export function BookingModal({ isOpen, onClose }: BookingModalProps) {
+    const { format: formatPrice, currency } = useCurrency();
     const [step, setStep] = useState<Step>('dates');
     const [direction, setDirection] = useState<1 | -1>(1);
     const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -403,7 +406,10 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                             {' · '}<span>{guests} guest{guests > 1 ? 's' : ''}</span>
                                         </div>
 
-                                        <p className="text-sm font-semibold text-gray-600">{availableRooms.length} villa{availableRooms.length !== 1 ? 's' : ''} available</p>
+                                        <p className="text-sm font-semibold text-gray-600">
+                                            {availableRooms.length} villa{availableRooms.length !== 1 ? 's' : ''} available
+                                            {currency !== BASE_CURRENCY && <span className="font-normal text-gray-400"> · prices estimated, payable in LKR</span>}
+                                        </p>
 
                                         {availableRooms.map((room) => {
                                             const isSelected = selectedRoom?._id === room._id;
@@ -430,13 +436,13 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                                                 </div>
                                                             </div>
                                                             <div className="text-right">
-                                                                <span className="block font-bold text-[#2E5D4B] text-lg">LKR {room.pricePerNight?.toLocaleString()}</span>
+                                                                <span className="block font-bold text-[#2E5D4B] text-lg">{formatPrice(room.pricePerNight)}</span>
                                                                 <span className="text-xs text-gray-400">/night</span>
                                                             </div>
                                                         </div>
                                                         {nights > 0 && (
                                                             <div className="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg mt-2">
-                                                                Total: <span className="font-semibold text-[#2A2018]">LKR {(room.pricePerNight * nights).toLocaleString()}</span> for {nights} night{nights > 1 ? 's' : ''}
+                                                                Total: <span className="font-semibold text-[#2A2018]">{formatPrice(room.pricePerNight * nights)}</span> for {nights} night{nights > 1 ? 's' : ''}
                                                             </div>
                                                         )}
                                                     </div>
@@ -490,10 +496,15 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                             <h4 className="font-semibold text-[#2E5D4B] text-sm flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Your Stay</h4>
                                             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mt-2">
                                                 <div><span className="text-xs text-gray-400 block">Villa</span><span className="font-medium text-[#2A2018]">{selectedRoom?.type}</span></div>
-                                                <div><span className="text-xs text-gray-400 block">Total</span><span className="font-medium text-[#2E5D4B]">LKR {(selectedRoom?.pricePerNight * nights).toLocaleString()}</span></div>
+                                                <div><span className="text-xs text-gray-400 block">Total</span><span className="font-medium text-[#2E5D4B]">{formatPrice(selectedRoom?.pricePerNight * nights)}</span></div>
                                                 <div><span className="text-xs text-gray-400 block">Check-in</span><span className="font-medium">{format(dateRange!.from!, 'MMM d, yyyy')}</span></div>
                                                 <div><span className="text-xs text-gray-400 block">Check-out</span><span className="font-medium">{format(dateRange!.to!, 'MMM d, yyyy')}</span></div>
                                             </div>
+                                            {currency !== BASE_CURRENCY && (
+                                                <p className="text-[11px] text-gray-400 pt-1">
+                                                    Estimated — payable in LKR at the villa.
+                                                </p>
+                                            )}
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-3">

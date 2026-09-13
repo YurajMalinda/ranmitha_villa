@@ -45,14 +45,6 @@ export default function LoginPage() {
             title="Admin Sign In"
             subtitle="Sign in to manage Ranmitha Villa"
             error={error}
-            footer={
-                <>
-                    Need an account?{' '}
-                    <Link href="/admin/signup" className="text-emerald-600 hover:underline font-medium">
-                        Sign up
-                    </Link>
-                </>
-            }
         >
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

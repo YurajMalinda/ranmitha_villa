@@ -1,4 +1,5 @@
 import { MotionProvider } from '@/components/providers/MotionProvider';
+import { CurrencyProvider } from '@/components/providers/CurrencyContext';
 import { BookingProvider } from '@/components/booking/BookingContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { HeroSection } from '@/components/sections/HeroSection';
@@ -18,6 +19,7 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 export default function HomePage() {
   return (
     <MotionProvider>
+      <CurrencyProvider>
       <BookingProvider>
         <div className="min-h-screen bg-white">
           <Navbar />
@@ -52,6 +54,7 @@ export default function HomePage() {
           <ScrollToTop />
         </div>
       </BookingProvider>
+      </CurrencyProvider>
     </MotionProvider>
   );
 }

@@ -2,8 +2,8 @@ import crypto from 'crypto'
 import AuthToken, { AuthTokenPurpose } from '@/models/AuthToken'
 
 const TTL_MS: Record<AuthTokenPurpose, number> = {
-  'verify-email': 24 * 60 * 60 * 1000, // 24 hours
   'reset-password': 60 * 60 * 1000, // 1 hour — shorter, it can change a password
+  invite: 7 * 24 * 60 * 60 * 1000, // 7 days — the invitee may not act on it right away
 }
 
 /** Tokens are compared by hash, so the raw value never has to be stored. */

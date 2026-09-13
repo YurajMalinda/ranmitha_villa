@@ -7,6 +7,7 @@ import { Bed, Users, Maximize, Check } from 'lucide-react';
 import { roomsData } from '@/data/rooms';
 import { RoomService } from '@/services/frontend/room.service';
 import { useBooking } from '@/components/booking/BookingContext';
+import { useCurrency } from '@/components/providers/CurrencyContext';
 
 interface ApiRoom {
     _id: string;
@@ -25,6 +26,7 @@ interface ApiRoom {
 
 export function RoomsSection() {
     const { openBooking } = useBooking();
+    const { format, currency } = useCurrency();
     const { title, description } = roomsData;
     const [rooms, setRooms] = useState<ApiRoom[]>([]);
     const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export function RoomsSection() {
     const displayRooms = rooms.map((r, i) => ({
         name: r.type,
         subtitle: r.maxGuests <= 2 ? 'Perfect for Couples' : 'Ideal for Families or Groups',
-        price: `LKR ${r.pricePerNight.toLocaleString()}`,
+        price: format(r.pricePerNight),
         description: r.description,
         image: r.images?.[0],
         size: r.size ? `${r.size} m²` : '—',
@@ -76,6 +78,11 @@ export function RoomsSection() {
                         <span className="text-[#2E5D4B]"> {title.highlight}</span>
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>
+                    {currency !== 'LKR' && (
+                        <p className="text-xs text-gray-400 mt-3">
+                            Prices shown in {currency} are estimates — payable in LKR at the villa.
+                        </p>
+                    )}
                 </motion.div>
 
                 {loading ? (
