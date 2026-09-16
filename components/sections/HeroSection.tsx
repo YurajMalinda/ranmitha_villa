@@ -6,6 +6,8 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapPin, ChevronDown, Sun, Cloud, CloudSun, CloudFog, CloudDrizzle, CloudRain, CloudSnow, CloudLightning } from 'lucide-react';
 import { heroData } from '@/data/hero';
 import { WeatherService } from '@/services/frontend/weather.service';
+import { WeatherEffects } from '@/components/sections/WeatherEffects';
+import { useWeatherEffectsToggle } from '@/components/providers/WeatherEffectsContext';
 
 /** WMO weather codes (Open-Meteo) collapsed into an icon. Mirrors the label
  *  mapping in lib/weather.ts, kept separate since that file pulls in
@@ -22,6 +24,25 @@ function weatherIcon(code: number) {
   return Cloud;
 }
 
+/** A soft color wash over the hero photo reflecting the actual current
+ *  condition — golden for clear skies, cool blue-gray for rain, darker
+ *  purple-gray for storms. Sits below the existing black gradient (which
+ *  stays, unchanged, for text contrast), so it reads as ambient light
+ *  rather than replacing the villa's brand palette. */
+function weatherTint(code: number | undefined) {
+  if (code === undefined) return '';
+  if (code === 0) return 'bg-gradient-to-b from-amber-400/20 via-orange-300/5 to-transparent';
+  if (code === 1 || code === 2) return 'bg-gradient-to-b from-amber-200/10 via-transparent to-transparent';
+  if (code === 3) return 'bg-gradient-to-b from-slate-400/10 to-transparent';
+  if (code === 45 || code === 48) return 'bg-white/10';
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
+    return 'bg-gradient-to-b from-slate-600/25 via-blue-900/10 to-transparent';
+  }
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'bg-gradient-to-b from-cyan-100/15 to-transparent';
+  if (code === 95 || code === 96 || code === 99) return 'bg-gradient-to-b from-purple-950/35 via-slate-900/15 to-transparent';
+  return '';
+}
+
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -33,6 +54,7 @@ export function HeroSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   const [weather, setWeather] = useState<{ tempC: number; label: string; weatherCode: number } | null>(null);
+  const { enabled: weatherEffectsEnabled } = useWeatherEffectsToggle();
 
   useEffect(() => {
     WeatherService.getCurrent()
@@ -58,6 +80,7 @@ export function HeroSection() {
         style={{ y }}
         className="absolute inset-0 z-0">
 
+        <div className={`absolute inset-0 z-5 transition-colors duration-1000 ${weatherEffectsEnabled ? weatherTint(weather?.weatherCode) : ''}`} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
         <Image
           src={background}
@@ -67,6 +90,11 @@ export function HeroSection() {
           sizes="100vw"
           className="object-cover" />
 
+        {weather && weatherEffectsEnabled && (
+          <div className="absolute inset-0 z-15">
+            <WeatherEffects code={weather.weatherCode} />
+          </div>
+        )}
       </motion.div>
 
       {/* Content */}

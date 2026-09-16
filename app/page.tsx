@@ -1,6 +1,7 @@
 import { MotionProvider } from '@/components/providers/MotionProvider';
 import { SiteThemeProvider } from '@/components/providers/SiteThemeContext';
 import { CurrencyProvider } from '@/components/providers/CurrencyContext';
+import { WeatherEffectsProvider } from '@/components/providers/WeatherEffectsContext';
 import { BookingProvider } from '@/components/booking/BookingContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { HeroSection } from '@/components/sections/HeroSection';
@@ -22,6 +23,7 @@ export default function HomePage() {
     <MotionProvider>
       <SiteThemeProvider>
       <CurrencyProvider>
+      <WeatherEffectsProvider>
       <BookingProvider>
         <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors">
           <Navbar />
@@ -56,6 +58,7 @@ export default function HomePage() {
           <ScrollToTop />
         </div>
       </BookingProvider>
+      </WeatherEffectsProvider>
       </CurrencyProvider>
       </SiteThemeProvider>
     </MotionProvider>

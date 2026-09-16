@@ -2,15 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, MessageCircle, Calendar, Sun, Moon } from 'lucide-react';
+import { Menu, X, MessageCircle, Calendar, Sun, Moon, CloudSun, CloudOff } from 'lucide-react';
 import { navbarData } from '@/data/navbar';
 import { useBooking } from '@/components/booking/BookingContext';
 import { CurrencySelector } from '@/components/layout/CurrencySelector';
 import { useSiteTheme } from '@/components/providers/SiteThemeContext';
+import { useWeatherEffectsToggle } from '@/components/providers/WeatherEffectsContext';
 
 export function Navbar() {
   const { openBooking } = useBooking();
   const { theme, toggleTheme } = useSiteTheme();
+  const { enabled: weatherEffectsEnabled, toggle: toggleWeatherEffects } = useWeatherEffectsToggle();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -66,6 +68,14 @@ export function Navbar() {
               aria-label="Toggle dark mode"
               className={`p-2 rounded-full transition-colors ${isScrolled ? 'text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800' : 'text-white/90 hover:bg-white/10'}`}>
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
+            <button
+              onClick={toggleWeatherEffects}
+              aria-label={weatherEffectsEnabled ? 'Turn off weather effects' : 'Turn on weather effects'}
+              title={weatherEffectsEnabled ? 'Turn off weather effects' : 'Turn on weather effects'}
+              className={`p-2 rounded-full transition-colors ${isScrolled ? 'text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800' : 'text-white/90 hover:bg-white/10'}`}>
+              {weatherEffectsEnabled ? <CloudSun className="w-4 h-4" /> : <CloudOff className="w-4 h-4" />}
             </button>
 
             {/* WhatsApp (Secondary) */}
@@ -155,6 +165,12 @@ export function Navbar() {
                       aria-label="Toggle dark mode"
                       className="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
                       {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={toggleWeatherEffects}
+                      aria-label={weatherEffectsEnabled ? 'Turn off weather effects' : 'Turn on weather effects'}
+                      className="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                      {weatherEffectsEnabled ? <CloudSun className="w-4 h-4" /> : <CloudOff className="w-4 h-4" />}
                     </button>
                   </div>
 

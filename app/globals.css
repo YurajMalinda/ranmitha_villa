@@ -202,6 +202,43 @@
     to { opacity: 1; transform: translateX(0); }
 }
 
+/* Hero weather effects */
+@keyframes weather-rainfall {
+    from { transform: translateY(-10vh); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    to { transform: translateY(110vh); opacity: 0; }
+}
+
+@keyframes weather-snowfall {
+    from { transform: translate(0, -10vh); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    to { transform: translate(20px, 110vh); opacity: 0; }
+}
+
+@keyframes weather-cloud-drift {
+    from { transform: translateX(-10%); }
+    to { transform: translateX(10%); }
+}
+
+@keyframes weather-fog-drift {
+    from { transform: translateX(-15%); opacity: 0.4; }
+    50% { opacity: 0.7; }
+    to { transform: translateX(15%); opacity: 0.4; }
+}
+
+@keyframes weather-sun-glow {
+    from { opacity: 0.5; transform: scale(0.95); }
+    to { opacity: 0.85; transform: scale(1.05); }
+}
+
+@keyframes weather-lightning {
+    0%, 92%, 100% { opacity: 0; }
+    93%, 95% { opacity: 0.8; }
+    94% { opacity: 0.1; }
+}
+
 /* Utilities */
 .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
