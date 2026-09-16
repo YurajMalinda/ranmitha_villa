@@ -1,4 +1,5 @@
 import { MotionProvider } from '@/components/providers/MotionProvider';
+import { SiteThemeProvider } from '@/components/providers/SiteThemeContext';
 import { CurrencyProvider } from '@/components/providers/CurrencyContext';
 import { BookingProvider } from '@/components/booking/BookingContext';
 import { Navbar } from '@/components/layout/Navbar';
@@ -19,9 +20,10 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 export default function HomePage() {
   return (
     <MotionProvider>
+      <SiteThemeProvider>
       <CurrencyProvider>
       <BookingProvider>
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors">
           <Navbar />
 
           <main>
@@ -55,6 +57,7 @@ export default function HomePage() {
         </div>
       </BookingProvider>
       </CurrencyProvider>
+      </SiteThemeProvider>
     </MotionProvider>
   );
 }

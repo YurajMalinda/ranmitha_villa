@@ -10,7 +10,7 @@ export function WelcomeSection() {
   const { main, badge } = images;
 
   return (
-    <section className="py-20 md:py-28 px-4 md:px-8 bg-white">
+    <section className="py-20 md:py-28 px-4 md:px-8 bg-white dark:bg-slate-950">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Image Side */}
@@ -37,14 +37,14 @@ export function WelcomeSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-5">
+              className="absolute -bottom-6 -right-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5">
 
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-[#FF5A5F] rounded-full flex items-center justify-center">
                   <Award className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="font-bold text-[#2A2018]">{badge.text}</p>
+                  <p className="font-bold text-[#2A2018] dark:text-white">{badge.text}</p>
                   <p className="text-sm text-[#FF5A5F] font-medium">
                     Since {badge.year}
                   </p>
@@ -63,10 +63,10 @@ export function WelcomeSection() {
             <span className="text-[#D4784A] text-sm font-bold tracking-widest uppercase mb-4 block">
               {heading.subtitle}
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] mb-6 leading-tight">
-              {heading.title} <span className="text-[#2E5D4B]">{heading.highlight}</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] dark:text-white mb-6 leading-tight">
+              {heading.title} <span className="text-[#2E5D4B] dark:text-emerald-400">{heading.highlight}</span>
             </h2>
-            <div className="space-y-4 text-gray-600 leading-relaxed">
+            <div className="space-y-4 text-gray-600 dark:text-gray-400 leading-relaxed">
               {content.paragraphs.map((paragraph: string, index: number) => (
                 <p key={index} dangerouslySetInnerHTML={{ __html: paragraph }} />
               ))}
@@ -75,9 +75,9 @@ export function WelcomeSection() {
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
               {stats.map((stat: any, index: number) => (
-                <div key={index} className="text-center p-4 rounded-xl bg-[#FBF8F3]">
-                  <p className="text-xl font-bold text-[#2E5D4B]">{stat.value}</p>
-                  <p className="text-xs text-gray-500">{stat.label}</p>
+                <div key={index} className="text-center p-4 rounded-xl bg-[#FBF8F3] dark:bg-slate-900">
+                  <p className="text-xl font-bold text-[#2E5D4B] dark:text-emerald-400">{stat.value}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
                 </div>
               ))}
             </div>

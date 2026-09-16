@@ -82,7 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="theme-color" content="#2E5D4B" />
         {/* Inline script: set dark class before React hydrates to prevent flash */}
-        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem('admin_theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}` }} />
+        <script dangerouslySetInnerHTML={{ __html: `try{var k=location.pathname.startsWith('/admin')?'admin_theme':'site_theme';if(localStorage.getItem(k)==='dark')document.documentElement.classList.add('dark')}catch(e){}` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

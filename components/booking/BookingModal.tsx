@@ -256,24 +256,24 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 40 }}
                             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                            className="relative w-full max-w-lg bg-white text-gray-900 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] pointer-events-auto overflow-hidden"
+                            className="relative w-full max-w-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] pointer-events-auto overflow-hidden"
                         >
                             {/* Accent top bar */}
                             <div className="h-1 w-full bg-gradient-to-r from-[#2E5D4B] via-[#3B7A62] to-[#D4784A]" />
 
                             {/* Header */}
-                            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-none">
+                            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex-none">
                                 <div className="flex items-center gap-3">
                                     {step !== 'dates' && step !== 'confirmation' && (
                                         <button
                                             onClick={handleBack}
-                                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-700"
+                                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                                         >
                                             <ChevronLeft className="w-4 h-4" />
                                         </button>
                                     )}
                                     <div>
-                                        <h3 className="font-bold text-base text-[#2A2018]">
+                                        <h3 className="font-bold text-base text-[#2A2018] dark:text-white">
                                             {step === 'dates' && 'Plan Your Stay'}
                                             {step === 'room' && 'Choose Your Villa'}
                                             {step === 'details' && 'Your Details'}
@@ -284,28 +284,28 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                         )}
                                     </div>
                                 </div>
-                                <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-700">
+                                <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
                             {/* Step Progress */}
                             {step !== 'confirmation' && (
-                                <div className="flex items-center px-5 py-3 gap-2 bg-gray-50/60 border-b border-gray-100">
+                                <div className="flex items-center px-5 py-3 gap-2 bg-gray-50/60 dark:bg-slate-800/40 border-b border-gray-100 dark:border-slate-800">
                                     {STEPS.slice(0, -1).map((s, i) => (
                                         <div key={s.key} className="flex items-center gap-2 flex-1">
                                             <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold transition-all ${
                                                 i < currentStepIndex ? 'bg-[#2E5D4B] text-white' :
                                                 i === currentStepIndex ? 'bg-[#2E5D4B] text-white ring-4 ring-[#2E5D4B]/20' :
-                                                'bg-gray-200 text-gray-400'
+                                                'bg-gray-200 dark:bg-slate-700 text-gray-400'
                                             }`}>
                                                 {i < currentStepIndex ? <Check className="w-3 h-3" /> : i + 1}
                                             </div>
-                                            <span className={`text-xs font-medium hidden sm:block ${i <= currentStepIndex ? 'text-[#2E5D4B]' : 'text-gray-400'}`}>
+                                            <span className={`text-xs font-medium hidden sm:block ${i <= currentStepIndex ? 'text-[#2E5D4B] dark:text-emerald-400' : 'text-gray-400'}`}>
                                                 {s.label}
                                             </span>
                                             {i < STEPS.length - 2 && (
-                                                <div className={`h-px flex-1 transition-all ${i < currentStepIndex ? 'bg-[#2E5D4B]' : 'bg-gray-200'}`} />
+                                                <div className={`h-px flex-1 transition-all ${i < currentStepIndex ? 'bg-[#2E5D4B]' : 'bg-gray-200 dark:bg-slate-700'}`} />
                                             )}
                                         </div>
                                     ))}
@@ -321,7 +321,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="mx-5 mt-3 flex items-start gap-2.5 bg-red-50 border border-red-100 text-red-700 text-sm px-4 py-3 rounded-xl">
+                                        <div className="mx-5 mt-3 flex items-start gap-2.5 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm px-4 py-3 rounded-xl">
                                             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                             <span>{error}</span>
                                         </div>
@@ -353,10 +353,10 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                         </div>
 
                                         <div>
-                                            <label className="text-sm font-semibold text-gray-700 block mb-2">Number of Guests</label>
-                                            <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-2">Number of Guests</label>
+                                            <div className="flex items-center justify-between bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                                                 <div>
-                                                    <span className="text-gray-800 font-medium text-sm">Adults & Children</span>
+                                                    <span className="text-gray-800 dark:text-gray-200 font-medium text-sm">Adults & Children</span>
                                                     {dateRange?.from && dateRange?.to && nights > 0 && (
                                                         <p className="text-xs text-gray-400 mt-0.5">
                                                             {nights} night{nights > 1 ? 's' : ''} · {format(dateRange.from, 'MMM d')} – {format(dateRange.to, 'MMM d, yyyy')}
@@ -365,13 +365,13 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                                 </div>
                                                 <div className="flex items-center gap-3">
                                                     <button
-                                                        className="w-9 h-9 flex items-center justify-center bg-white rounded-lg shadow-sm hover:bg-gray-50 border border-gray-200 transition-all font-bold text-lg text-gray-600 disabled:opacity-40"
+                                                        className="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 transition-all font-bold text-lg text-gray-600 dark:text-gray-200 disabled:opacity-40"
                                                         onClick={() => setGuests(Math.max(1, guests - 1))}
                                                         disabled={guests <= 1}
                                                     >−</button>
-                                                    <span className="font-bold text-xl w-5 text-center text-[#2E5D4B]">{guests}</span>
+                                                    <span className="font-bold text-xl w-5 text-center text-[#2E5D4B] dark:text-emerald-400">{guests}</span>
                                                     <button
-                                                        className="w-9 h-9 flex items-center justify-center bg-white rounded-lg shadow-sm hover:bg-gray-50 border border-gray-200 transition-all font-bold text-lg text-gray-600 disabled:opacity-40"
+                                                        className="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 transition-all font-bold text-lg text-gray-600 dark:text-gray-200 disabled:opacity-40"
                                                         onClick={() => setGuests(Math.min(10, guests + 1))}
                                                         disabled={guests >= 10}
                                                     >+</button>
@@ -401,13 +401,13 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                     transition={{ duration: 0.22, ease: 'easeInOut' }}
                                 >
                                     <div className="space-y-4">
-                                        <div className="bg-[#2E5D4B]/5 border border-[#2E5D4B]/10 rounded-xl px-4 py-3 text-sm text-[#2E5D4B]">
+                                        <div className="bg-[#2E5D4B]/5 dark:bg-emerald-500/10 border border-[#2E5D4B]/10 dark:border-emerald-500/20 rounded-xl px-4 py-3 text-sm text-[#2E5D4B] dark:text-emerald-400">
                                             <span className="font-semibold">{nights} night{nights > 1 ? 's' : ''}</span>
                                             {' · '}{format(dateRange!.from!, 'MMM d')} – {format(dateRange!.to!, 'MMM d, yyyy')}
                                             {' · '}<span>{guests} guest{guests > 1 ? 's' : ''}</span>
                                         </div>
 
-                                        <p className="text-sm font-semibold text-gray-600">
+                                        <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
                                             {availableRooms.length} villa{availableRooms.length !== 1 ? 's' : ''} available
                                             {currency !== BASE_CURRENCY && <span className="font-normal text-gray-400"> · prices estimated, payable in USD</span>}
                                         </p>
@@ -419,8 +419,8 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                                     key={room._id}
                                                     onClick={() => setSelectedRoom(room)}
                                                     className={`relative border rounded-xl cursor-pointer transition-all overflow-hidden ${isSelected
-                                                        ? 'border-[#2E5D4B] ring-2 ring-[#2E5D4B]/20 shadow-md'
-                                                        : 'border-gray-200 hover:border-[#2E5D4B]/40 hover:shadow-sm'
+                                                        ? 'border-[#2E5D4B] dark:border-emerald-400 ring-2 ring-[#2E5D4B]/20 dark:ring-emerald-400/20 shadow-md'
+                                                        : 'border-gray-200 dark:border-slate-700 hover:border-[#2E5D4B]/40 dark:hover:border-emerald-400/40 hover:shadow-sm'
                                                     }`}
                                                 >
                                                     {room.images?.[0] && (
@@ -431,19 +431,19 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                                     <div className="p-4">
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div>
-                                                                <h4 className="font-bold text-[#2A2018]">{room.type}</h4>
-                                                                <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                                                                <h4 className="font-bold text-[#2A2018] dark:text-white">{room.type}</h4>
+                                                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                                     <Users className="w-3 h-3" /> Max {room.maxGuests} guests
                                                                 </div>
                                                             </div>
                                                             <div className="text-right">
-                                                                <span className="block font-bold text-[#2E5D4B] text-lg">{formatPrice(perNightPrice(room, guests))}</span>
+                                                                <span className="block font-bold text-[#2E5D4B] dark:text-emerald-400 text-lg">{formatPrice(perNightPrice(room, guests))}</span>
                                                                 <span className="text-xs text-gray-400">/night for {guests} guest{guests > 1 ? 's' : ''}</span>
                                                             </div>
                                                         </div>
                                                         {nights > 0 && (
-                                                            <div className="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg mt-2">
-                                                                Total: <span className="font-semibold text-[#2A2018]">{formatPrice(totalPrice(room, guests, nights))}</span> for {nights} night{nights > 1 ? 's' : ''}
+                                                            <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg mt-2">
+                                                                Total: <span className="font-semibold text-[#2A2018] dark:text-white">{formatPrice(totalPrice(room, guests, nights))}</span> for {nights} night{nights > 1 ? 's' : ''}
                                                             </div>
                                                         )}
                                                     </div>
@@ -481,7 +481,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                     <div className="space-y-4">
                                         {/* Hold countdown */}
                                         {secondsLeft !== null && (
-                                            <div className="flex items-center justify-center gap-2 text-xs bg-[#D4784A]/10 border border-[#D4784A]/20 text-[#B85F30] rounded-lg py-2 px-3">
+                                            <div className="flex items-center justify-center gap-2 text-xs bg-[#D4784A]/10 border border-[#D4784A]/20 text-[#B85F30] dark:text-orange-300 rounded-lg py-2 px-3">
                                                 <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                                                 <span>
                                                     We&apos;re holding this villa for{' '}
@@ -493,11 +493,11 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                         )}
 
                                         {/* Stay summary */}
-                                        <div className="bg-[#2E5D4B]/5 border border-[#2E5D4B]/10 rounded-xl p-4 space-y-1.5">
-                                            <h4 className="font-semibold text-[#2E5D4B] text-sm flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Your Stay</h4>
-                                            <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mt-2">
-                                                <div><span className="text-xs text-gray-400 block">Villa</span><span className="font-medium text-[#2A2018]">{selectedRoom?.type}</span></div>
-                                                <div><span className="text-xs text-gray-400 block">Total</span><span className="font-medium text-[#2E5D4B]">{formatPrice(selectedRoom ? totalPrice(selectedRoom, guests, nights) : 0)}</span></div>
+                                        <div className="bg-[#2E5D4B]/5 dark:bg-emerald-500/10 border border-[#2E5D4B]/10 dark:border-emerald-500/20 rounded-xl p-4 space-y-1.5">
+                                            <h4 className="font-semibold text-[#2E5D4B] dark:text-emerald-400 text-sm flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Your Stay</h4>
+                                            <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                                <div><span className="text-xs text-gray-400 block">Villa</span><span className="font-medium text-[#2A2018] dark:text-white">{selectedRoom?.type}</span></div>
+                                                <div><span className="text-xs text-gray-400 block">Total</span><span className="font-medium text-[#2E5D4B] dark:text-emerald-400">{formatPrice(selectedRoom ? totalPrice(selectedRoom, guests, nights) : 0)}</span></div>
                                                 <div><span className="text-xs text-gray-400 block">Check-in</span><span className="font-medium">{format(dateRange!.from!, 'MMM d, yyyy')}</span></div>
                                                 <div><span className="text-xs text-gray-400 block">Check-out</span><span className="font-medium">{format(dateRange!.to!, 'MMM d, yyyy')}</span></div>
                                             </div>
@@ -514,11 +514,11 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                                 { key: 'lastname', label: 'Last Name', placeholder: 'Doe', type: 'text' },
                                             ].map(({ key, label, placeholder, type }) => (
                                                 <div key={key}>
-                                                    <label className="text-xs font-semibold text-gray-600 block mb-1.5">{label}</label>
+                                                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 block mb-1.5">{label}</label>
                                                     <input
                                                         type={type}
                                                         placeholder={placeholder}
-                                                        className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2E5D4B]/20 focus:border-[#2E5D4B] outline-none transition-all text-sm text-gray-900 bg-white placeholder:text-gray-400"
+                                                        className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#2E5D4B]/20 focus:border-[#2E5D4B] outline-none transition-all text-sm text-gray-900 dark:text-white bg-white dark:bg-slate-800 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                                         value={guestDetails[key as keyof typeof guestDetails]}
                                                         onChange={(e) => setGuestDetails({ ...guestDetails, [key]: e.target.value })}
                                                     />
@@ -527,11 +527,11 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                         </div>
 
                                         <div>
-                                            <label className="text-xs font-semibold text-gray-600 block mb-1.5">Email Address *</label>
+                                            <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 block mb-1.5">Email Address *</label>
                                             <input
                                                 type="email"
                                                 placeholder="john@example.com"
-                                                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2E5D4B]/20 focus:border-[#2E5D4B] outline-none transition-all text-sm text-gray-900 bg-white placeholder:text-gray-400"
+                                                className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#2E5D4B]/20 focus:border-[#2E5D4B] outline-none transition-all text-sm text-gray-900 dark:text-white bg-white dark:bg-slate-800 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                                 value={guestDetails.email}
                                                 onChange={(e) => setGuestDetails({ ...guestDetails, email: e.target.value })}
                                             />
@@ -543,11 +543,11 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                                 { key: 'country', label: 'Country', placeholder: 'Sri Lanka', type: 'text' },
                                             ].map(({ key, label, placeholder, type }) => (
                                                 <div key={key}>
-                                                    <label className="text-xs font-semibold text-gray-600 block mb-1.5">{label}</label>
+                                                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 block mb-1.5">{label}</label>
                                                     <input
                                                         type={type}
                                                         placeholder={placeholder}
-                                                        className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2E5D4B]/20 focus:border-[#2E5D4B] outline-none transition-all text-sm text-gray-900 bg-white placeholder:text-gray-400"
+                                                        className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#2E5D4B]/20 focus:border-[#2E5D4B] outline-none transition-all text-sm text-gray-900 dark:text-white bg-white dark:bg-slate-800 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                                         value={guestDetails[key as keyof typeof guestDetails]}
                                                         onChange={(e) => setGuestDetails({ ...guestDetails, [key]: e.target.value })}
                                                     />
@@ -581,20 +581,20 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             transition={{ type: 'spring', damping: 12, stiffness: 200 }}
-                                            className="w-20 h-20 bg-[#EFF7F3] rounded-full flex items-center justify-center mx-auto mb-6"
+                                            className="w-20 h-20 bg-[#EFF7F3] dark:bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6"
                                         >
-                                            <PartyPopper className="w-9 h-9 text-[#2E5D4B]" />
+                                            <PartyPopper className="w-9 h-9 text-[#2E5D4B] dark:text-emerald-400" />
                                         </motion.div>
 
                                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                                            <h3 className="text-2xl font-bold text-[#2A2018] mb-2">You&apos;re All Set!</h3>
+                                            <h3 className="text-2xl font-bold text-[#2A2018] dark:text-white mb-2">You&apos;re All Set!</h3>
                                             <p className="text-gray-500 mb-4 leading-relaxed">
                                                 Your booking request has been received. We&apos;ll confirm your reservation shortly.
                                             </p>
                                             {confirmedBookingId && (
-                                                <div className="inline-block bg-[#2E5D4B]/5 border border-[#2E5D4B]/10 rounded-xl px-5 py-3 mb-6">
+                                                <div className="inline-block bg-[#2E5D4B]/5 dark:bg-emerald-500/10 border border-[#2E5D4B]/10 dark:border-emerald-500/20 rounded-xl px-5 py-3 mb-6">
                                                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Booking Reference</p>
-                                                    <p className="font-mono font-bold text-[#2E5D4B] text-lg">{confirmedBookingId}</p>
+                                                    <p className="font-mono font-bold text-[#2E5D4B] dark:text-emerald-400 text-lg">{confirmedBookingId}</p>
                                                 </div>
                                             )}
                                             <p className="text-xs text-gray-400 mb-8">Check your email for confirmation details.</p>

@@ -27,7 +27,7 @@ export function TestimonialsSection() {
     }, []);
 
     return (
-        <section id="reviews" className="py-20 md:py-28 px-4 md:px-8 bg-[#FBF8F3]">
+        <section id="reviews" className="py-20 md:py-28 px-4 md:px-8 bg-[#FBF8F3] dark:bg-slate-950">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -38,10 +38,10 @@ export function TestimonialsSection() {
                     <span className="text-[#D4784A] text-sm font-bold tracking-widest uppercase mb-4 block">
                         {heading.subtitle}
                     </span>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] mb-4">
-                        {heading.title} <span className="text-[#2E5D4B]">{heading.highlight}</span>
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] dark:text-white mb-4">
+                        {heading.title} <span className="text-[#2E5D4B] dark:text-emerald-400">{heading.highlight}</span>
                     </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto mb-8">{heading.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">{heading.description}</p>
 
                     <div className="flex flex-wrap justify-center gap-4">
                         {ratings.map((rating: any, index: number) =>
@@ -51,7 +51,7 @@ export function TestimonialsSection() {
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                className={`flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-sm ${rating.isAward ? 'ring-2 ring-[#FF5A5F]/30' : ''}`}>
+                                className={`flex items-center gap-3 bg-white dark:bg-slate-900 px-5 py-3 rounded-full shadow-sm ${rating.isAward ? 'ring-2 ring-[#FF5A5F]/30' : ''}`}>
                                 {rating.isAward ? (
                                     <>
                                         <Award className="w-5 h-5" style={{ color: rating.color }} />
@@ -62,7 +62,7 @@ export function TestimonialsSection() {
                                         {rating.score}
                                     </div>
                                 )}
-                                <span className="text-gray-700 font-medium text-sm">{rating.platform}</span>
+                                <span className="text-gray-700 dark:text-gray-300 font-medium text-sm">{rating.platform}</span>
                             </motion.div>
                         )}
                     </div>
@@ -78,8 +78,8 @@ export function TestimonialsSection() {
                             <Award className="w-10 h-10 text-white" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-[#2A2018] mb-2">{superhost.title}</h3>
-                            <p className="text-gray-600">{superhost.description}</p>
+                            <h3 className="text-xl font-bold text-[#2A2018] dark:text-white mb-2">{superhost.title}</h3>
+                            <p className="text-gray-600 dark:text-gray-400">{superhost.description}</p>
                         </div>
                     </div>
                 </motion.div>
@@ -87,15 +87,15 @@ export function TestimonialsSection() {
                 {loading && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {Array.from({ length: 3 }).map((_, i) => (
-                            <div key={i} className="bg-white rounded-2xl p-8 shadow-sm space-y-4 animate-pulse">
-                                <div className="h-4 bg-gray-200 rounded w-24" />
+                            <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm space-y-4 animate-pulse">
+                                <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-24" />
                                 <div className="space-y-2">
-                                    <div className="h-3 bg-gray-200 rounded" />
-                                    <div className="h-3 bg-gray-200 rounded w-5/6" />
-                                    <div className="h-3 bg-gray-200 rounded w-4/6" />
+                                    <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded" />
+                                    <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded w-5/6" />
+                                    <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded w-4/6" />
                                 </div>
-                                <div className="pt-4 border-t border-gray-100">
-                                    <div className="h-4 bg-gray-200 rounded w-28" />
+                                <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
+                                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-28" />
                                 </div>
                             </div>
                         ))}
@@ -111,25 +111,25 @@ export function TestimonialsSection() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.15 }}
-                                className="bg-white rounded-2xl p-8 shadow-sm relative">
+                                className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm relative">
                                 <Quote className="w-10 h-10 text-[#D4784A]/20 absolute top-6 right-6" />
                                 <div className="flex items-center gap-1 mb-4">
                                     {[...Array(5)].map((_, i) =>
                                         <Star
                                             key={i}
-                                            className={`w-4 h-4 ${i < Math.round(testimonial.rating) ? 'text-[#D4784A]' : 'text-gray-200'}`}
+                                            className={`w-4 h-4 ${i < Math.round(testimonial.rating) ? 'text-[#D4784A]' : 'text-gray-200 dark:text-slate-700'}`}
                                             fill={i < Math.round(testimonial.rating) ? '#D4784A' : '#e5e7eb'}
                                         />
                                     )}
-                                    <span className="ml-2 text-sm font-bold text-[#2E5D4B]">
+                                    <span className="ml-2 text-sm font-bold text-[#2E5D4B] dark:text-emerald-400">
                                         {Number(testimonial.rating).toFixed(1)}
                                     </span>
                                 </div>
-                                <p className="text-gray-600 leading-relaxed mb-6 italic">&ldquo;{testimonial.quote}&rdquo;</p>
-                                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6 italic">&ldquo;{testimonial.quote}&rdquo;</p>
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800">
                                     <div>
-                                        <p className="font-semibold text-[#2A2018]">{testimonial.author}</p>
-                                        <p className="text-sm text-gray-500">{testimonial.source}</p>
+                                        <p className="font-semibold text-[#2A2018] dark:text-white">{testimonial.author}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.source}</p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -146,7 +146,7 @@ export function TestimonialsSection() {
                         href={cta.booking.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#2A2018] px-6 py-3 rounded-full shadow-sm transition-colors font-medium">
+                        className="inline-flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-[#2A2018] dark:text-white px-6 py-3 rounded-full shadow-sm transition-colors font-medium">
                         {cta.booking.label}
                         <ExternalLink className="w-4 h-4" />
                     </a>

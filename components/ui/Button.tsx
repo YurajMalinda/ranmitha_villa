@@ -27,8 +27,8 @@ export function Button({
     const variants = {
         primary: 'bg-[#2E5D4B] hover:bg-[#1E4A3A] text-white focus:ring-[#2E5D4B]',
         secondary: 'bg-[#D4784A] hover:bg-[#B85F30] text-white focus:ring-[#D4784A]',
-        outline: 'border-2 border-[#2E5D4B] text-[#2E5D4B] hover:bg-[#2E5D4B] hover:text-white focus:ring-[#2E5D4B]',
-        ghost: 'text-[#2E5D4B] hover:bg-[#EFF7F3] focus:ring-[#2E5D4B]'
+        outline: 'border-2 border-[#2E5D4B] dark:border-emerald-400 text-[#2E5D4B] dark:text-emerald-400 hover:bg-[#2E5D4B] dark:hover:bg-emerald-400 hover:text-white dark:hover:text-slate-950 focus:ring-[#2E5D4B]',
+        ghost: 'text-[#2E5D4B] dark:text-emerald-400 hover:bg-[#EFF7F3] dark:hover:bg-slate-800 focus:ring-[#2E5D4B]'
     };
 
     const sizes = {

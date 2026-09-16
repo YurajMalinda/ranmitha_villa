@@ -52,32 +52,32 @@ export function FAQSection() {
     };
 
     return (
-        <section className="py-20 bg-[#F9F9F9]">
+        <section className="py-20 bg-[#F9F9F9] dark:bg-slate-950">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
             />
             <div className="container mx-auto px-4 max-w-4xl">
                 <div className="text-center mb-16">
-                    <span className="text-[#2E5D4B] uppercase tracking-widest text-sm font-semibold">Common Questions</span>
-                    <h2 className="text-3xl md:text-4xl font-serif text-[#2A2018] mt-3">Good to Know</h2>
+                    <span className="text-[#2E5D4B] dark:text-emerald-400 uppercase tracking-widest text-sm font-semibold">Common Questions</span>
+                    <h2 className="text-3xl md:text-4xl font-serif text-[#2A2018] dark:text-white mt-3">Good to Know</h2>
                 </div>
 
                 <div className="space-y-4">
                     {faqs.map((faq, index) => (
                         <div
                             key={index}
-                            className="bg-white rounded-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-sm"
+                            className="bg-white dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-sm"
                         >
                             <button
                                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                                 className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
                             >
-                                <span className={`text-lg font-medium ${openIndex === index ? 'text-[#2E5D4B]' : 'text-[#2A2018]'}`}>
+                                <span className={`text-lg font-medium ${openIndex === index ? 'text-[#2E5D4B] dark:text-emerald-400' : 'text-[#2A2018] dark:text-white'}`}>
                                     {faq.question}
                                 </span>
                                 {openIndex === index ? (
-                                    <ChevronUp className="w-5 h-5 text-[#2E5D4B]" />
+                                    <ChevronUp className="w-5 h-5 text-[#2E5D4B] dark:text-emerald-400" />
                                 ) : (
                                     <ChevronDown className="w-5 h-5 text-gray-400" />
                                 )}
@@ -91,7 +91,7 @@ export function FAQSection() {
                                         exit={{ height: 0, opacity: 0 }}
                                         transition={{ duration: 0.3, ease: "easeInOut" }}
                                     >
-                                        <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+                                        <div className="px-6 pb-6 text-gray-600 dark:text-gray-400 leading-relaxed">
                                             {faq.answer}
                                         </div>
                                     </motion.div>

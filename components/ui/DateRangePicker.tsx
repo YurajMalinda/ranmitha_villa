@@ -18,6 +18,7 @@ import {
   startOfDay,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useSiteTheme } from '@/components/providers/SiteThemeContext'
 
 export interface DateRange {
   from: Date | undefined
@@ -31,10 +32,15 @@ interface DateRangePickerProps {
 }
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-const PRIMARY = '#2E5D4B'
-const PRIMARY_LIGHT = '#E6F4F1'
+const PRIMARY_LIGHT_MODE = '#2E5D4B'
+const PRIMARY_DARK_MODE = '#34d399'
+const RANGE_BG_LIGHT_MODE = '#E6F4F1'
+const RANGE_BG_DARK_MODE = 'rgba(52, 211, 153, 0.15)'
 
 export function DateRangePicker({ date, setDate, className }: DateRangePickerProps) {
+  const { theme } = useSiteTheme()
+  const PRIMARY = theme === 'dark' ? PRIMARY_DARK_MODE : PRIMARY_LIGHT_MODE
+  const PRIMARY_LIGHT = theme === 'dark' ? RANGE_BG_DARK_MODE : RANGE_BG_LIGHT_MODE
   const today = startOfDay(new Date())
   const [currentMonth, setCurrentMonth] = useState(today)
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null)
@@ -90,12 +96,12 @@ export function DateRangePicker({ date, setDate, className }: DateRangePickerPro
   const days = buildCalendarDays(currentMonth)
 
   return (
-    <div className={`bg-white rounded-lg border border-gray-100 shadow-sm select-none ${className ?? ''}`}>
+    <div className={`bg-white dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-800 shadow-sm select-none ${className ?? ''}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-800">
         <button
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="p-1 rounded hover:bg-gray-100 transition-colors"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
           aria-label="Previous month"
         >
           <ChevronLeft size={16} color={PRIMARY} />
@@ -105,7 +111,7 @@ export function DateRangePicker({ date, setDate, className }: DateRangePickerPro
         </span>
         <button
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="p-1 rounded hover:bg-gray-100 transition-colors"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
           aria-label="Next month"
         >
           <ChevronRight size={16} color={PRIMARY} />
@@ -167,16 +173,16 @@ export function DateRangePicker({ date, setDate, className }: DateRangePickerPro
                 disabled={isPast}
                 className={[
                   'relative z-10 w-8 h-8 rounded-full text-sm transition-colors',
-                  isPast ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer',
-                  !isCurrentMonth ? 'text-gray-300' : '',
+                  isPast ? 'text-gray-300 dark:text-slate-700 cursor-not-allowed' : 'cursor-pointer',
+                  !isCurrentMonth ? 'text-gray-300 dark:text-slate-700' : '',
                   selected
                     ? 'text-white font-semibold'
                     : inRange
-                      ? 'text-gray-700'
+                      ? 'text-gray-700 dark:text-gray-200'
                       : isToday && !selected
                         ? 'font-bold'
                         : isCurrentMonth && !isPast
-                          ? 'hover:bg-gray-100 text-gray-700'
+                          ? 'hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-200'
                           : '',
                 ].join(' ')}
                 style={
@@ -195,7 +201,7 @@ export function DateRangePicker({ date, setDate, className }: DateRangePickerPro
       </div>
 
       {/* Selected range display */}
-      <div className="px-4 pb-3 pt-1 border-t border-gray-100 text-sm text-gray-500">
+      <div className="px-4 pb-3 pt-1 border-t border-gray-100 dark:border-slate-800 text-sm text-gray-500 dark:text-gray-400">
         {date?.from ? (
           date.to ? (
             <span>

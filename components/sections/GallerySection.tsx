@@ -64,7 +64,7 @@ export function GallerySection() {
     }, [selectedImage, goToPrevious, goToNext]);
 
     return (
-        <section id="gallery" className="py-20 md:py-28 px-4 md:px-8 bg-[#FBF8F3]">
+        <section id="gallery" className="py-20 md:py-28 px-4 md:px-8 bg-[#FBF8F3] dark:bg-slate-950">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -74,17 +74,17 @@ export function GallerySection() {
                     <span className="text-[#D4784A] text-sm font-bold tracking-widest uppercase mb-4 block">
                         {heading.subtitle}
                     </span>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] mb-4">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] dark:text-white mb-4">
                         {heading.title}{' '}
-                        <span className="text-[#2E5D4B]">{heading.highlight}</span>
+                        <span className="text-[#2E5D4B] dark:text-emerald-400">{heading.highlight}</span>
                     </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">{heading.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">{heading.description}</p>
                 </motion.div>
 
                 {images.length === 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {Array.from({ length: 8 }).map((_, i) => (
-                            <div key={i} className={`rounded-xl bg-gray-200 animate-pulse ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`} style={{ aspectRatio: '1' }} />
+                            <div key={i} className={`rounded-xl bg-gray-200 dark:bg-slate-800 animate-pulse ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`} style={{ aspectRatio: '1' }} />
                         ))}
                     </div>
                 )}
@@ -127,7 +127,7 @@ export function GallerySection() {
                         href={cta.facebook}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#2A2018] px-6 py-3 rounded-full shadow-sm transition-colors font-medium border border-gray-200">
+                        className="inline-flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-[#2A2018] dark:text-white px-6 py-3 rounded-full shadow-sm transition-colors font-medium border border-gray-200 dark:border-slate-700">
                         <Camera className="w-4 h-4" />
                         {cta.label}
                     </a>

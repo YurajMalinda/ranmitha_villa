@@ -19,7 +19,7 @@ export function LocationSection() {
   const { heading, address, distances, attractions } = locationData;
 
   return (
-    <section id="location" className="py-20 md:py-28 px-4 md:px-8 bg-white">
+    <section id="location" className="py-20 md:py-28 px-4 md:px-8 bg-white dark:bg-slate-950">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Content Side */}
@@ -31,23 +31,23 @@ export function LocationSection() {
             <span className="text-[#D4784A] text-sm font-bold tracking-widest uppercase mb-4 block">
               {heading.subtitle}
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] mb-6">
-              {heading.title} <span className="text-[#2E5D4B]">{heading.highlight}</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2A2018] dark:text-white mb-6">
+              {heading.title} <span className="text-[#2E5D4B] dark:text-emerald-400">{heading.highlight}</span>
             </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-8">
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
               {heading.description}
             </p>
 
             {/* Address */}
-            <div className="bg-[#FBF8F3] rounded-xl p-6 mb-8">
+            <div className="bg-[#FBF8F3] dark:bg-slate-900 rounded-xl p-6 mb-8">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-[#2E5D4B] rounded-lg flex items-center justify-center shrink-0">
                   <MapPin className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#2A2018] mb-1">{address.title}</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-bold text-[#2A2018] dark:text-white mb-1">{address.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
                     {address.line1}
                     <br />
                     {address.line2}
@@ -56,7 +56,7 @@ export function LocationSection() {
                     href={address.googleMapsLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#2E5D4B] hover:text-[#D4784A] text-sm font-medium mt-2 inline-block">
+                    className="text-[#2E5D4B] dark:text-emerald-400 hover:text-[#D4784A] text-sm font-medium mt-2 inline-block">
 
                     {address.directionsLabel}
                   </a>
@@ -75,14 +75,14 @@ export function LocationSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center gap-3 p-3 bg-[#FBF8F3] rounded-lg">
+                    className="flex items-center gap-3 p-3 bg-[#FBF8F3] dark:bg-slate-900 rounded-lg">
 
-                    <Icon className="w-5 h-5 text-[#2E5D4B]" />
+                    <Icon className="w-5 h-5 text-[#2E5D4B] dark:text-emerald-400" />
                     <div>
-                      <p className="text-sm font-medium text-[#2A2018]">
+                      <p className="text-sm font-medium text-[#2A2018] dark:text-white">
                         {item.label}
                       </p>
-                      <p className="text-xs text-gray-500">{item.time}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.time}</p>
                     </div>
                   </motion.div>
                 );
@@ -116,15 +116,15 @@ export function LocationSection() {
             </div>
 
             {/* Nearby Attractions */}
-            <div className="bg-[#EFF7F3] rounded-2xl p-6">
-              <h3 className="font-bold text-[#2A2018] mb-4">
+            <div className="bg-[#EFF7F3] dark:bg-slate-900 rounded-2xl p-6">
+              <h3 className="font-bold text-[#2A2018] dark:text-white mb-4">
                 {attractions.nearbyTitle}
               </h3>
               <ul className="space-y-3">
                 {attractions.list.map((attraction: string, index: number) =>
                   <li key={index} className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-[#D4784A]" />
-                    <span className="text-gray-600 text-sm">{attraction}</span>
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">{attraction}</span>
                   </li>
                 )}
               </ul>

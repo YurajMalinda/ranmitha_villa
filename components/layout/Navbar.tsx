@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, MessageCircle, Calendar } from 'lucide-react';
+import { Menu, X, MessageCircle, Calendar, Sun, Moon } from 'lucide-react';
 import { navbarData } from '@/data/navbar';
 import { useBooking } from '@/components/booking/BookingContext';
 import { CurrencySelector } from '@/components/layout/CurrencySelector';
+import { useSiteTheme } from '@/components/providers/SiteThemeContext';
 
 export function Navbar() {
   const { openBooking } = useBooking();
+  const { theme, toggleTheme } = useSiteTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -28,13 +30,13 @@ export function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg py-3' : 'bg-transparent py-5'}`}>
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white dark:bg-slate-900 shadow-lg py-3' : 'bg-transparent py-5'}`}>
 
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
             <span
-              className={`text-xl md:text-2xl font-serif font-bold transition-colors ${isScrolled ? 'text-[#2E5D4B]' : 'text-white'}`}>
+              className={`text-xl md:text-2xl font-serif font-bold transition-colors ${isScrolled ? 'text-[#2E5D4B] dark:text-emerald-400' : 'text-white'}`}>
               {logoText}
             </span>
           </a>
@@ -45,7 +47,7 @@ export function Navbar() {
               <a
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors relative group ${isScrolled ? 'text-gray-700 hover:text-[#2E5D4B]' : 'text-white/90 hover:text-white'}`}>
+                className={`text-sm font-medium transition-colors relative group ${isScrolled ? 'text-gray-700 dark:text-gray-300 hover:text-[#2E5D4B] dark:hover:text-emerald-400' : 'text-white/90 hover:text-white'}`}>
 
                 {link.name}
                 <span
@@ -59,12 +61,19 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <CurrencySelector light={!isScrolled} />
 
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              className={`p-2 rounded-full transition-colors ${isScrolled ? 'text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800' : 'text-white/90 hover:bg-white/10'}`}>
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
             {/* WhatsApp (Secondary) */}
             <a
               href={contact.whatsapp.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium transition-all ${isScrolled ? 'text-[#25D366] hover:bg-green-50' : 'text-white/80 hover:text-white'}`}>
+              className={`flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium transition-all ${isScrolled ? 'text-[#25D366] hover:bg-green-50 dark:hover:bg-slate-800' : 'text-white/80 hover:text-white'}`}>
               <MessageCircle className="w-4 h-4" />
               {contact.whatsapp.label}
             </a>
@@ -81,7 +90,7 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`lg:hidden p-2 transition-colors ${isScrolled ? 'text-[#2E5D4B]' : 'text-white'}`}
+            className={`lg:hidden p-2 transition-colors ${isScrolled ? 'text-[#2E5D4B] dark:text-emerald-400' : 'text-white'}`}
             aria-label="Toggle menu">
 
             {isMobileMenuOpen ?
@@ -109,16 +118,16 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-white shadow-2xl z-50 lg:hidden">
+              className="fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-slate-900 shadow-2xl z-50 lg:hidden">
 
               <div className="flex flex-col h-full">
-                <div className="flex justify-between items-center p-4 border-b border-gray-100">
-                  <span className="font-serif font-bold text-[#2E5D4B]">
+                <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-800">
+                  <span className="font-serif font-bold text-[#2E5D4B] dark:text-emerald-400">
                     {logoText}
                   </span>
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 text-gray-500">
+                    className="p-2 text-gray-500 dark:text-gray-400">
 
                     <X className="w-5 h-5" />
                   </button>
@@ -132,15 +141,21 @@ export function Navbar() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-6 py-3 text-gray-700 hover:bg-[#EFF7F3] hover:text-[#2E5D4B] transition-colors font-medium">
+                      className="block px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#EFF7F3] dark:hover:bg-slate-800 hover:text-[#2E5D4B] dark:hover:text-emerald-400 transition-colors font-medium">
 
                       {link.name}
                     </motion.a>
                   )}
                 </div>
-                <div className="p-4 border-t border-gray-100 space-y-3">
-                  <div className="flex justify-center">
+                <div className="p-4 border-t border-gray-100 dark:border-slate-800 space-y-3">
+                  <div className="flex justify-center items-center gap-3">
                     <CurrencySelector />
+                    <button
+                      onClick={toggleTheme}
+                      aria-label="Toggle dark mode"
+                      className="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                      {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    </button>
                   </div>
 
                   <button
