@@ -7,7 +7,7 @@ export const welcomeData = {
     },
     content: {
         paragraphs: [
-            "Just a 5-minute walk (200m) from the famous Weligama surfing beach, our family-owned villa provides a peaceful retreat close to all the action. Whether you're a digital nomad needing high-speed WiFi, a family looking for a safe and spacious stay, or a surfer chasing waves, we have everything you need.",
+            "Just a 5-minute walk (200m) from the famous Weligama surfing beach, our villa provides a peaceful retreat close to all the action. Whether you're a digital nomad needing high-speed WiFi, a family looking for a safe and spacious stay, or a surfer chasing waves, we have everything you need.",
             "Each unit is a fully equipped private retreat featuring a full kitchen, modern bathroom, and dedicated workspace. Enjoy the freedom to cook your own meals, wash your clothes, and relax on your private terrace."
         ],
         signature: {
@@ -39,7 +39,7 @@ export const welcomeData = {
             label: "Spacious Units"
         },
         {
-            value: "9.0",
+            value: "9.4",
             label: "Booking.com Rating"
         }
     ]

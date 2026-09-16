@@ -2,7 +2,7 @@ import { connectDB } from '@/lib/db'
 import ExchangeRate from '@/models/ExchangeRate'
 import { BASE_CURRENCY } from '@/lib/currency'
 
-const TTL_MS = 6 * 60 * 60 * 1000 // 6 hours — LKR moves slowly enough that this is fine for a display estimate.
+const TTL_MS = 6 * 60 * 60 * 1000 // 6 hours — fine for a display estimate, not a live rate feed.
 const RATES_URL = `https://open.er-api.com/v6/latest/${BASE_CURRENCY}`
 
 /**

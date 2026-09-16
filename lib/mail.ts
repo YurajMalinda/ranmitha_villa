@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import nodemailer from 'nodemailer'
 import { generateInvoicePDF } from './pdf'
+import { perNightPrice } from './pricing'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -74,14 +75,14 @@ export const getInvoiceTemplate = (reservation: any, room: any, user: any) => `
                     </span>
                 </td>
                 <td>${reservation.nights} Nights</td>
-                <td>${room.pricePerNight.toLocaleString()} LKR</td>
-                <td>${(reservation.nights * room.pricePerNight).toLocaleString()} LKR</td>
+                <td>$${perNightPrice(room, reservation.guests).toLocaleString()}</td>
+                <td>$${(reservation.nights * perNightPrice(room, reservation.guests)).toLocaleString()}</td>
             </tr>
         </tbody>
         <tfoot>
             <tr class="total-row">
                 <td colspan="3" style="text-align:right;">Total:</td>
-                <td>${reservation.total_price.toLocaleString()} LKR</td>
+                <td>$${reservation.total_price.toLocaleString()}</td>
             </tr>
         </tfoot>
     </table>
@@ -156,7 +157,7 @@ export const getConfirmLetter = (reservation: any, room: any, user: any) => `
                 </div>
                 <div class="card-row">
                     <span class="card-label">Total to Pay</span>
-                    <span class="card-value" style="font-size: 18px; font-weight: bold;">LKR ${reservation.total_price.toLocaleString()}</span>
+                    <span class="card-value" style="font-size: 18px; font-weight: bold;">$${reservation.total_price.toLocaleString()}</span>
                 </div>
             </div>
 
@@ -269,7 +270,7 @@ export const getAdminNotificationLetter = (reservation: any, room: any, user: an
                                 <strong>Room:</strong> ${room.type}<br>
                                 <strong>Stay:</strong> ${new Date(reservation.check_in_date).toDateString()} - ${new Date(reservation.check_out_date).toDateString()}<br>
                                 <strong>Nights:</strong> ${reservation.nights}<br>
-                                <strong>Total:</strong> LKR ${reservation.total_price}
+                                <strong>Total:</strong> $${reservation.total_price}
                             </p>
                         </td>
                     </tr>

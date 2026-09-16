@@ -4,6 +4,9 @@ export interface IRoom extends Document {
   type: 'Standard Villa' | 'Family Villa'
   description: string
   pricePerNight: number
+  /** Guest count `pricePerNight` covers before `extraGuestFee` kicks in. */
+  baseOccupancy: number
+  extraGuestFee: number
   maxGuests: number
   beds: { king: number; queen: number; twin: number }
   size: string
@@ -26,6 +29,8 @@ const roomSchema = new Schema(
     },
     description: { type: String, required: true },
     pricePerNight: { type: Number, required: true },
+    baseOccupancy: { type: Number, required: true, default: 2 },
+    extraGuestFee: { type: Number, required: true, default: 0 },
     maxGuests: { type: Number, required: true },
     beds: {
       king: { type: Number, required: true, default: 0 },

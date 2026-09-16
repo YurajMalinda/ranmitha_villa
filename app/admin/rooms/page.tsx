@@ -13,6 +13,8 @@ interface Room {
     type: string;
     description: string;
     pricePerNight: number;
+    baseOccupancy: number;
+    extraGuestFee: number;
     maxGuests: number;
     images: string[];
     beds: { king: number; queen: number; twin: number };
@@ -35,7 +37,7 @@ function RoomsContent() {
     const toast = useToast();
 
     const [form, setForm] = useState({
-        type: '', description: '', pricePerNight: '', maxGuests: '',
+        type: '', description: '', pricePerNight: '', baseOccupancy: '2', extraGuestFee: '0', maxGuests: '',
         size: '', amenities: '', bathrooms: '1', hasAC: true,
         beds: { king: 0, queen: 0, twin: 0 }
     });
@@ -74,6 +76,8 @@ function RoomsContent() {
             fd.append('type', form.type);
             fd.append('description', form.description);
             fd.append('pricePerNight', form.pricePerNight);
+            fd.append('baseOccupancy', form.baseOccupancy);
+            fd.append('extraGuestFee', form.extraGuestFee);
             fd.append('maxGuests', form.maxGuests);
             fd.append('bathrooms', form.bathrooms);
             fd.append('size', form.size);
@@ -128,7 +132,7 @@ function RoomsContent() {
 
     const openAdd = () => {
         setEditing(null);
-        setForm({ type: '', description: '', pricePerNight: '', maxGuests: '2', size: '', amenities: '', bathrooms: '1', hasAC: true, beds: { king: 1, queen: 0, twin: 0 } });
+        setForm({ type: '', description: '', pricePerNight: '', baseOccupancy: '2', extraGuestFee: '0', maxGuests: '2', size: '', amenities: '', bathrooms: '1', hasAC: true, beds: { king: 1, queen: 0, twin: 0 } });
         setNewFiles([]);
         setKeptImages([]);
         setErrors({});
@@ -139,6 +143,7 @@ function RoomsContent() {
         setEditing(r);
         setForm({
             type: r.type, description: r.description, pricePerNight: String(r.pricePerNight),
+            baseOccupancy: String(r.baseOccupancy ?? 2), extraGuestFee: String(r.extraGuestFee ?? 0),
             maxGuests: String(r.maxGuests), size: r.size, amenities: r.amenities.join(', '),
             bathrooms: String(r.bathrooms), hasAC: r.hasAC, beds: r.beds || { king: 0, queen: 0, twin: 0 }
         });
@@ -218,14 +223,19 @@ function RoomsContent() {
                             </div>
 
                             <div className="p-5 flex-1 flex flex-col">
-                                <div className="flex items-center justify-between mb-4">
-                                    <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">LKR {r.pricePerNight.toLocaleString()}<span className="text-gray-400 text-xs font-normal"> / night</span></p>
+                                <div className="flex items-center justify-between mb-1">
+                                    <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">${r.pricePerNight.toLocaleString()}<span className="text-gray-400 text-xs font-normal"> / night</span></p>
                                     <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                                         <span className="flex items-center gap-1"><span className="font-semibold">{r.maxGuests}</span> Guests</span>
                                         <span className="flex items-center gap-1"><span className="font-semibold">{r.size}</span> ft²</span>
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">{r.description}</p>
+                                {!!r.extraGuestFee && (
+                                    <p className="text-xs text-gray-400 mb-3">
+                                        up to {r.baseOccupancy ?? 2} guests, then +${r.extraGuestFee}/guest
+                                    </p>
+                                )}
+                                <p className={`text-sm text-gray-500 dark:text-gray-400 line-clamp-2 ${r.extraGuestFee ? '' : 'mt-4'} mb-4`}>{r.description}</p>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {r.amenities.slice(0, 3).map((a, i) => (
                                         <span key={i} className="px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[10px] font-medium uppercase tracking-wide">{a}</span>
@@ -266,11 +276,21 @@ function RoomsContent() {
                             {errors.type && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.type}</p>}
                         </div>
                         <div>
-                            <label className="admin-label">Price (LKR) *</label>
-                            <input type="number" className={`admin-input ${errors.pricePerNight ? 'border-red-400' : ''}`} value={form.pricePerNight} onChange={e => setForm({ ...form, pricePerNight: e.target.value })} placeholder="e.g. 15000" />
+                            <label className="admin-label">Price (USD) *</label>
+                            <input type="number" className={`admin-input ${errors.pricePerNight ? 'border-red-400' : ''}`} value={form.pricePerNight} onChange={e => setForm({ ...form, pricePerNight: e.target.value })} placeholder="e.g. 18" />
                             {errors.pricePerNight && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.pricePerNight}</p>}
                         </div>
                         <div><label className="admin-label">Max Guests</label><input type="number" className="admin-input" value={form.maxGuests} onChange={e => setForm({ ...form, maxGuests: e.target.value })} /></div>
+                        <div>
+                            <label className="admin-label">Base Occupancy</label>
+                            <input type="number" min={1} className="admin-input" value={form.baseOccupancy} onChange={e => setForm({ ...form, baseOccupancy: e.target.value })} placeholder="e.g. 2" />
+                            <p className="text-xs text-gray-400 mt-1">Guests included in the price above</p>
+                        </div>
+                        <div>
+                            <label className="admin-label">Extra Guest Fee (USD)</label>
+                            <input type="number" min={0} className="admin-input" value={form.extraGuestFee} onChange={e => setForm({ ...form, extraGuestFee: e.target.value })} placeholder="e.g. 2" />
+                            <p className="text-xs text-gray-400 mt-1">Per guest beyond base occupancy, per night</p>
+                        </div>
                         <div><label className="admin-label">Size (sq ft)</label><input className="admin-input" value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} /></div>
                         <div><label className="admin-label">Bathrooms</label><input type="number" className="admin-input" value={form.bathrooms} onChange={e => setForm({ ...form, bathrooms: e.target.value })} /></div>
                     </div>

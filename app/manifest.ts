@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
     return {
         name: 'Ranmitha Villa Weligama',
         short_name: 'Ranmitha Villa',
-        description: 'Family-owned boutique villa 200m from Weligama Beach, Sri Lanka. Rated 9.0 on Booking.com.',
+        description: 'A boutique villa 200m from Weligama Beach, Sri Lanka. Rated 9.4 on Booking.com.',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

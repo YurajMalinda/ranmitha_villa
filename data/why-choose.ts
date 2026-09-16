@@ -22,7 +22,7 @@ export const whyChooseData = {
             icon: 'Wallet',
             color: 'bg-green-50 text-green-600',
             features: [
-                { icon: null, text: '9.0 on Booking.com · 4.6★ on TripAdvisor' },
+                { icon: null, text: '9.4 on Booking.com · 4.6★ on TripAdvisor' },
                 { icon: null, text: 'Budget-friendly rates vs similar properties' },
                 { icon: 'Wifi', text: 'Free WiFi and parking for all guests' },
                 { icon: null, text: 'Transparent pricing with no hidden fees' }

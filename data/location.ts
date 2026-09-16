@@ -2,7 +2,7 @@ export const locationData = {
     heading: {
         subtitle: "Location",
         title: "In the Heart of",
-        highlight: "Pelena",
+        highlight: "Weligama",
         description: "Located just 200 meters from the beach and within walking distance to the town center, Ranmitha Villa offers the perfect balance of accessibility and tranquility."
     },
     address: {
@@ -17,7 +17,7 @@ export const locationData = {
             icon: 'Waves',
             label: 'Weligama Beach',
             distance: '200 m',
-            time: '5 min walk'
+            time: '3 min walk'
         },
         {
             icon: 'Store',

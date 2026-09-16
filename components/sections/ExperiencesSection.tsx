@@ -16,11 +16,15 @@ interface Tour {
   features: string[];
 }
 
+const TOUR_PREVIEW_COUNT = 8;
+
 export function ExperiencesSection() {
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
   const { heading } = experiencesData;
+  const visibleTours = showAll ? tours : tours.slice(0, TOUR_PREVIEW_COUNT);
 
   useEffect(() => {
     TourService.listTours().then((response) => {
@@ -72,7 +76,7 @@ export function ExperiencesSection() {
 
         {!loading && tours.length === 0 ? null : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tours.map((tour, index) => (
+            {visibleTours.map((tour, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -108,6 +112,17 @@ export function ExperiencesSection() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        )}
+
+        {!showAll && tours.length > TOUR_PREVIEW_COUNT && (
+          <div className="text-center mt-10">
+            <button
+              onClick={() => setShowAll(true)}
+              className="px-6 py-3 rounded-full border-2 border-[#2E5D4B] text-[#2E5D4B] font-semibold hover:bg-[#2E5D4B] hover:text-white transition-colors"
+            >
+              Show {tours.length - TOUR_PREVIEW_COUNT} More Experiences
+            </button>
           </div>
         )}
       </div>

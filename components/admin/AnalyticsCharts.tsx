@@ -85,11 +85,11 @@ export default function AnalyticsCharts({ bookings }: AnalyticsChartsProps) {
                                     axisLine={false}
                                     tickLine={false}
                                     tick={{ fill: '#64748b', fontSize: 12 }}
-                                    tickFormatter={(value) => `LKR ${(value / 1000).toFixed(0)}k`}
+                                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                                 />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                                    formatter={(value: any) => [`LKR ${(Number(value) || 0).toLocaleString()}`, 'Revenue']}
+                                    formatter={(value: any) => [`$${(Number(value) || 0).toLocaleString()}`, 'Revenue']}
                                 />
                                 <Area
                                     type="monotone"

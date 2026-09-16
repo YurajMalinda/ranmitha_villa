@@ -11,6 +11,7 @@ import userRepository from '@/repositories/user.repository'
 import userService from './user.service'
 import crypto from 'crypto'
 import BlockedDate from '@/models/BlockedDates'
+import { perNightPrice, totalPrice } from '@/lib/pricing'
 
 class AppError extends Error {
   statusCode: number
@@ -65,7 +66,7 @@ class BookingService {
         guests: Number(guests),
         nights: Number(nights),
         status: 'pending',
-        total_price: (room as any).pricePerNight * nights,
+        total_price: totalPrice(room as any, Number(guests), nights),
       }
 
       const booking = await BookingRepository.create(bookingData, session)
@@ -163,8 +164,8 @@ class BookingService {
                                     </table>
                                     <h3 style="border-bottom:1px solid #ddd; padding-bottom:5px;">💰 Payment Summary</h3>
                                     <table width="100%" cellpadding="5">
-                                        <tr><td><strong>Price per Night:</strong></td><td>${rm['pricePerNight']} LKR</td></tr>
-                                        <tr><td><strong>Total Amount:</strong></td><td><strong>${res['total_price']} LKR</strong></td></tr>
+                                        <tr><td><strong>Price per Night:</strong></td><td>$${perNightPrice(rm, res['guests'])}</td></tr>
+                                        <tr><td><strong>Total Amount:</strong></td><td><strong>$${res['total_price']}</strong></td></tr>
                                         <tr><td><strong>Payment Method:</strong></td><td>Pay at Villa</td></tr>
                                     </table>
                                     <h3 style="border-bottom:1px solid #ddd; padding-bottom:5px;">⏰ Check-in Information</h3>

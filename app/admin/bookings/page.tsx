@@ -160,7 +160,7 @@ function BookingsContent() {
                                                 </span>
                                             </td>
                                             <td className="font-medium text-gray-900 dark:text-white">
-                                                LKR {b.total_price?.toLocaleString()}
+                                                ${b.total_price?.toLocaleString()}
                                             </td>
                                             <td>
                                                 <div className="flex items-center gap-2">
@@ -241,7 +241,7 @@ function BookingsContent() {
                                     <div className="p-4 bg-gray-50 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-700">
                                         <p className="text-xs text-gray-400 uppercase font-semibold tracking-wide mb-2">Room</p>
                                         <p className="font-semibold text-gray-900 dark:text-white text-sm">{selectedBooking.room?.type || 'Unknown'}</p>
-                                        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-bold mt-1">LKR {selectedBooking.total_price?.toLocaleString()}</p>
+                                        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-bold mt-1">${selectedBooking.total_price?.toLocaleString()}</p>
                                     </div>
                                     <div className="p-4 bg-gray-50 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-700">
                                         <p className="text-xs text-gray-400 uppercase font-semibold tracking-wide mb-2 flex items-center gap-1"><CalendarCheck size={12} /> Check In</p>

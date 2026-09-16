@@ -11,7 +11,7 @@ class AppError extends Error {
 class RoomService {
   async createRoom(body: any, imageUrls: Record<string, string>) {
     try {
-      const { type, description, pricePerNight, maxGuests, bedrooms, beds, size, amenities, bathrooms, hasAC, status } = body
+      const { type, description, pricePerNight, baseOccupancy, extraGuestFee, maxGuests, bedrooms, beds, size, amenities, bathrooms, hasAC, status } = body
 
       const images = Object.values(imageUrls).filter(Boolean)
 
@@ -19,6 +19,8 @@ class RoomService {
         type,
         description,
         pricePerNight: Number(pricePerNight),
+        baseOccupancy: Number(baseOccupancy) || 2,
+        extraGuestFee: Number(extraGuestFee) || 0,
         maxGuests: Number(maxGuests),
         beds: JSON.parse(beds),
         bedrooms: Number(bedrooms),
@@ -76,7 +78,7 @@ class RoomService {
 
   async updateRoom(body: any, newImageUrls: Record<string, string>) {
     try {
-      const { roomId, type, description, pricePerNight, maxGuests, beds, bedrooms, size, amenities, bathrooms, hasAC } = body
+      const { roomId, type, description, pricePerNight, baseOccupancy, extraGuestFee, maxGuests, beds, bedrooms, size, amenities, bathrooms, hasAC } = body
 
       if (!roomId) {
         throw new AppError('Room ID must be needed', 400)
@@ -110,6 +112,8 @@ class RoomService {
       room['type'] = type
       room['description'] = description
       room['pricePerNight'] = Number(pricePerNight)
+      room['baseOccupancy'] = Number(baseOccupancy) || 2
+      room['extraGuestFee'] = Number(extraGuestFee) || 0
       room['maxGuests'] = Number(maxGuests)
       room['beds'] = JSON.parse(beds)
       room['bedrooms'] = Number(bedrooms)

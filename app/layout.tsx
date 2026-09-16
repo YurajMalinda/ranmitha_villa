@@ -18,8 +18,8 @@ const lato = Lato({
 })
 
 export const metadata: Metadata = {
-  title: 'Ranmitha Villa Weligama | Family-Owned Boutique Villa in Sri Lanka',
-  description: 'Stay at Ranmitha Villa — a family-owned boutique villa 200m from Weligama Beach. Spacious self-contained villas with full kitchen, fast WiFi, and 9.0 rating on Booking.com. Surfing, whale watching, and Galle Fort nearby.',
+  title: 'Ranmitha Villa Weligama | Boutique Villa in Sri Lanka',
+  description: 'Stay at Ranmitha Villa — a boutique villa 200m from Weligama Beach. Spacious self-contained villas with full kitchen, fast WiFi, and 9.4 rating on Booking.com. Surfing, whale watching, and Galle Fort nearby.',
   keywords: [
     'Ranmitha Villa',
     'Weligama villa',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Ranmitha Villa' }],
   openGraph: {
     title: 'Ranmitha Villa Weligama | Boutique Villa 200m from the Beach',
-    description: 'Family-owned villa in Weligama, Sri Lanka. Spacious self-contained units with full kitchen, 200m from the beach. Rated 9.0 on Booking.com.',
+    description: 'A boutique villa in Weligama, Sri Lanka. Spacious self-contained units with full kitchen, 200m from the beach. Rated 9.4 on Booking.com.',
     url: 'https://www.ranmithavilla.com',
     siteName: 'Ranmitha Villa',
     images: [
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Ranmitha Villa Weligama | Boutique Villa in Sri Lanka',
-    description: 'Family-owned villa 200m from Weligama Beach. Rated 9.0 on Booking.com.',
+    description: 'A boutique villa in Weligama, Sri Lanka. Spacious self-contained units with full kitchen, 200m from the beach. Rated 9.4 on Booking.com.',
     images: ['https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/af/c5/ab/ranmitha-villa-weligama.jpg?w=1200&h=628&s=1'],
   },
   alternates: {
@@ -91,7 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "@context": "https://schema.org",
                 "@type": "LodgingBusiness",
                 "name": "Ranmitha Villa",
-                "description": "Family-owned boutique villa 200m from Weligama Beach, Sri Lanka. Spacious self-contained units with full kitchen, fast WiFi, and warm Sri Lankan hospitality.",
+                "description": "A boutique villa 200m from Weligama Beach, Sri Lanka. Spacious self-contained units with full kitchen, fast WiFi, and warm Sri Lankan hospitality.",
                 "url": "https://www.ranmithavilla.com",
                 "telephone": "+94718116780",
                 "email": "ranmithavilla@gmail.com",
@@ -110,7 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 },
                 "aggregateRating": {
                   "@type": "AggregateRating",
-                  "ratingValue": "9.0",
+                  "ratingValue": "9.4",
                   "bestRating": "10",
                   "worstRating": "1",
                   "ratingCount": "50",

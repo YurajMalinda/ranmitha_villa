@@ -116,7 +116,7 @@ function DashboardContent() {
                 {[
                     { label: 'Total Rooms', value: stats.total, icon: <Hotel size={20} />, color: '#6366f1' },
                     { label: 'Total Bookings', value: stats.bookings, icon: <CalendarCheck size={20} />, color: '#10b981' },
-                    { label: 'Revenue', value: `LKR ${stats.revenue.toLocaleString()}`, icon: <DollarSign size={20} />, color: '#f59e0b', width: 'col-span-1 sm:col-span-2 xl:col-span-1' },
+                    { label: 'Revenue', value: `$${stats.revenue.toLocaleString()}`, icon: <DollarSign size={20} />, color: '#f59e0b', width: 'col-span-1 sm:col-span-2 xl:col-span-1' },
                     { label: 'Pending', value: stats.pending, icon: <Clock size={20} />, color: '#f97316' },
                     { label: 'Occupancy (Est.)', value: `${stats.occupancy}%`, icon: <TrendingUp size={20} />, color: '#8b5cf6' },
                     { label: 'Confirmed', value: stats.confirmed, icon: <Users size={20} />, color: '#10b981' },
@@ -220,7 +220,7 @@ function DashboardContent() {
                                                 <td>{b.room?.type || '—'}</td>
                                                 <td>{new Date(b.check_in_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                                                 <td>{new Date(b.check_out_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                                                <td style={{ fontWeight: 600 }}>LKR {b.total_price.toLocaleString()}</td>
+                                                <td style={{ fontWeight: 600 }}>${b.total_price.toLocaleString()}</td>
                                                 <td>
                                                     <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${b.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700' :
                                                         b.status === 'pending' ? 'bg-amber-50 text-amber-700' :

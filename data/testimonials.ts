@@ -3,12 +3,12 @@ export const testimonialsData = {
         subtitle: "Guest Reviews",
         title: "Loved by",
         highlight: "Travelers",
-        description: "See why we are rated 9.0/10 on Booking.com and recognized as an Airbnb Superhost."
+        description: "See why we are rated 9.4/10 on Booking.com and recognized as an Airbnb Superhost."
     },
     ratings: [
         {
             platform: 'Booking.com',
-            score: '9.0',
+            score: '9.4',
             color: '#003580'
         },
         {

@@ -8,12 +8,15 @@ import { roomsData } from '@/data/rooms';
 import { RoomService } from '@/services/frontend/room.service';
 import { useBooking } from '@/components/booking/BookingContext';
 import { useCurrency } from '@/components/providers/CurrencyContext';
+import { BASE_CURRENCY } from '@/lib/currency';
 
 interface ApiRoom {
     _id: string;
     type: string;
     description: string;
     pricePerNight: number;
+    baseOccupancy?: number;
+    extraGuestFee?: number;
     maxGuests: number;
     images: string[];
     beds: { king: number; queen: number; twin: number };
@@ -24,12 +27,23 @@ interface ApiRoom {
     status: string;
 }
 
+const AMENITY_PREVIEW_COUNT = 6;
+
 export function RoomsSection() {
     const { openBooking } = useBooking();
     const { format, currency } = useCurrency();
     const { title, description } = roomsData;
     const [rooms, setRooms] = useState<ApiRoom[]>([]);
     const [loading, setLoading] = useState(true);
+    const [expandedAmenities, setExpandedAmenities] = useState<Set<string>>(new Set());
+
+    const toggleAmenities = (id: string) => {
+        setExpandedAmenities((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
 
     useEffect(() => {
         RoomService.getAll()
@@ -52,13 +66,16 @@ export function RoomsSection() {
         name: r.type,
         subtitle: r.maxGuests <= 2 ? 'Perfect for Couples' : 'Ideal for Families or Groups',
         price: format(r.pricePerNight),
+        extraGuestNote: r.extraGuestFee
+            ? `+${format(r.extraGuestFee)} per guest beyond ${r.baseOccupancy ?? 2}`
+            : null,
         description: r.description,
         image: r.images?.[0],
         size: r.size ? `${r.size} m²` : '—',
         guests: `${r.maxGuests} Adults`,
         beds: bedsLabel(r.beds),
         featured: i === 0,
-        amenities: r.amenities?.slice(0, 5) || [],
+        amenities: r.amenities || [],
         _id: r._id,
     }));
 
@@ -78,9 +95,9 @@ export function RoomsSection() {
                         <span className="text-[#2E5D4B]"> {title.highlight}</span>
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>
-                    {currency !== 'LKR' && (
+                    {currency !== BASE_CURRENCY && (
                         <p className="text-xs text-gray-400 mt-3">
-                            Prices shown in {currency} are estimates — payable in LKR at the villa.
+                            Prices shown in {currency} are estimates — payable in USD at the villa.
                         </p>
                     )}
                 </motion.div>
@@ -139,7 +156,10 @@ export function RoomsSection() {
 
                                 <div className="p-6 md:p-8">
                                     <h3 className="text-2xl font-bold text-[#2A2018] mb-1">{room.name}</h3>
-                                    <p className="text-[#D4784A] font-medium mb-5">{room.subtitle}</p>
+                                    <p className={`text-[#D4784A] font-medium ${room.extraGuestNote ? 'mb-1' : 'mb-5'}`}>{room.subtitle}</p>
+                                    {room.extraGuestNote && (
+                                        <p className="text-xs text-gray-400 mb-4">{room.extraGuestNote}</p>
+                                    )}
 
                                     <div className="flex flex-wrap gap-3 mb-5">
                                         <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg text-sm text-gray-600 shadow-sm">
@@ -159,15 +179,31 @@ export function RoomsSection() {
                                     <p className="text-gray-600 text-sm leading-relaxed mb-5">{room.description}</p>
 
                                     {room.amenities.length > 0 && (
-                                        <div className="grid grid-cols-2 gap-2 mb-6">
-                                            {room.amenities.map((amenity, aIndex) => (
-                                                <div key={aIndex} className="flex items-center gap-2">
-                                                    <div className="w-4 h-4 rounded-full bg-[#EFF7F3] flex items-center justify-center flex-shrink-0">
-                                                        <Check className="w-2.5 h-2.5 text-[#2E5D4B]" />
+                                        <div className="mb-6">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {(expandedAmenities.has(room._id)
+                                                    ? room.amenities
+                                                    : room.amenities.slice(0, AMENITY_PREVIEW_COUNT)
+                                                ).map((amenity, aIndex) => (
+                                                    <div key={aIndex} className="flex items-center gap-2">
+                                                        <div className="w-4 h-4 rounded-full bg-[#EFF7F3] flex items-center justify-center flex-shrink-0">
+                                                            <Check className="w-2.5 h-2.5 text-[#2E5D4B]" />
+                                                        </div>
+                                                        <span className="text-xs text-gray-600">{amenity}</span>
                                                     </div>
-                                                    <span className="text-xs text-gray-600">{amenity}</span>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
+                                            {room.amenities.length > AMENITY_PREVIEW_COUNT && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleAmenities(room._id)}
+                                                    className="text-xs font-semibold text-[#2E5D4B] mt-3 hover:underline"
+                                                >
+                                                    {expandedAmenities.has(room._id)
+                                                        ? 'Show less'
+                                                        : `+${room.amenities.length - AMENITY_PREVIEW_COUNT} more amenities`}
+                                                </button>
+                                            )}
                                         </div>
                                     )}
 

@@ -15,10 +15,10 @@ interface CurrencyContextValue {
     currency: CurrencyCode;
     setCurrency: (currency: CurrencyCode) => void;
     /** True once live rates have loaded — until then, or if they failed to
-     *  load, conversion silently falls back to LKR rather than showing a
-     *  wrong number. */
+     *  load, conversion silently falls back to the base currency rather than
+     *  showing a wrong number. */
     ratesReady: boolean;
-    format: (amountLKR: number) => string;
+    format: (amountBase: number) => string;
 }
 
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
@@ -49,7 +49,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
                 if (data?.success && data.rates) setRates(data.rates);
             })
             .catch(() => {
-                /* conversion just falls back to LKR below */
+                /* conversion just falls back to the base currency below */
             });
         // Runs once on mount only — reads the stored preference and kicks off
         // the rates fetch; `currency` is read only to avoid a redundant set.
@@ -66,9 +66,9 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const format = useCallback(
-        (amountLKR: number) => {
-            if (currency === BASE_CURRENCY || !rates) return formatCurrency(amountLKR, BASE_CURRENCY);
-            return formatCurrency(convertFromBase(amountLKR, currency, rates), currency);
+        (amountBase: number) => {
+            if (currency === BASE_CURRENCY || !rates) return formatCurrency(amountBase, BASE_CURRENCY);
+            return formatCurrency(convertFromBase(amountBase, currency, rates), currency);
         },
         [currency, rates]
     );
