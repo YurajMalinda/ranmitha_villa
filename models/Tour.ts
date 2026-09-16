@@ -5,6 +5,7 @@ export interface ITour extends Document {
   description: string
   price: string
   duration: string
+  category: string
   features: string[]
   images: string[]
 }
@@ -14,6 +15,7 @@ const tourSchema = new Schema({
   description: { type: String, required: true },
   price: { type: String, default: 'Contact for Price' },
   duration: { type: String, default: 'Flexible' },
+  category: { type: String, default: 'Other', trim: true },
   features: { type: [String], default: [] },
   images: { type: Array, required: true },
 })

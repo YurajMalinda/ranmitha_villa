@@ -14,6 +14,7 @@ interface Tour {
     description: string;
     price: string;
     duration: string;
+    category: string;
     features: string[];
     images: string[];
 }
@@ -23,7 +24,7 @@ function ToursContent() {
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState<Tour | null>(null);
-    const [form, setForm] = useState({ name: '', description: '', price: '', duration: '', featuresText: '' });
+    const [form, setForm] = useState({ name: '', description: '', price: '', duration: '', category: '', featuresText: '' });
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [keptImages, setKeptImages] = useState<string[]>([]);
     const [saving, setSaving] = useState(false);
@@ -61,6 +62,7 @@ function ToursContent() {
             fd.append('description', form.description);
             fd.append('price', form.price);
             fd.append('duration', form.duration);
+            fd.append('category', form.category);
             fd.append('features', JSON.stringify(features));
             imageFiles.forEach((file, index) => {
                 if (index < 5) fd.append(`image${index + 1}`, file);
@@ -96,7 +98,7 @@ function ToursContent() {
 
     const openAdd = () => {
         setEditing(null);
-        setForm({ name: '', description: '', price: '', duration: '', featuresText: '' });
+        setForm({ name: '', description: '', price: '', duration: '', category: '', featuresText: '' });
         setImageFiles([]);
         setKeptImages([]);
         setErrors({});
@@ -105,7 +107,7 @@ function ToursContent() {
 
     const openEdit = (t: Tour) => {
         setEditing(t);
-        setForm({ name: t.name, description: t.description, price: t.price || '', duration: t.duration || '', featuresText: (t.features || []).join('\n') });
+        setForm({ name: t.name, description: t.description, price: t.price || '', duration: t.duration || '', category: t.category || '', featuresText: (t.features || []).join('\n') });
         setImageFiles([]);
         setKeptImages(t.images || []);
         setErrors({});
@@ -153,10 +155,11 @@ function ToursContent() {
                                 </div>
                             </div>
                             <div className="p-5 flex-1 flex flex-col">
-                                {(t.price || t.duration) && (
+                                {(t.price || t.duration || t.category) && (
                                     <div className="flex flex-wrap gap-2 mb-3">
                                         {t.price && <span className="text-xs bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">{t.price}</span>}
                                         {t.duration && <span className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full">{t.duration}</span>}
+                                        {t.category && <span className="text-xs bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 px-2 py-0.5 rounded-full">{t.category}</span>}
                                     </div>
                                 )}
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-3 flex-1">{t.description}</p>
@@ -244,6 +247,22 @@ function ToursContent() {
                                 onChange={(e) => setForm({ ...form, duration: e.target.value })}
                                 placeholder="e.g. Full Day (8 hrs)"
                             />
+                        </div>
+                        <div className="col-span-2">
+                            <label className="admin-label">Category</label>
+                            <input
+                                className="admin-input"
+                                list="tour-categories"
+                                value={form.category}
+                                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                placeholder="e.g. Adventure, Cultural, Relaxation"
+                            />
+                            <datalist id="tour-categories">
+                                {Array.from(new Set(tours.map((t) => t.category).filter(Boolean))).map((c) => (
+                                    <option key={c} value={c} />
+                                ))}
+                            </datalist>
+                            <p className="text-xs text-gray-400 mt-1">Used to group tours into filter tabs on the site</p>
                         </div>
                     </div>
                     <div>

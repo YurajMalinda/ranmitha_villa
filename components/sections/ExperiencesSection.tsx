@@ -12,19 +12,25 @@ interface Tour {
   images: string[];
   price: string;
   duration: string;
+  category: string;
   description: string;
   features: string[];
 }
 
 const TOUR_PREVIEW_COUNT = 8;
+const ALL_CATEGORY = 'All';
 
 export function ExperiencesSection() {
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(ALL_CATEGORY);
   const { heading } = experiencesData;
-  const visibleTours = showAll ? tours : tours.slice(0, TOUR_PREVIEW_COUNT);
+
+  const categories = [ALL_CATEGORY, ...Array.from(new Set(tours.map((t) => t.category).filter(Boolean)))];
+  const filteredTours = activeCategory === ALL_CATEGORY ? tours : tours.filter((t) => t.category === activeCategory);
+  const visibleTours = showAll ? filteredTours : filteredTours.slice(0, TOUR_PREVIEW_COUNT);
 
   useEffect(() => {
     TourService.listTours().then((response) => {
@@ -34,6 +40,7 @@ export function ExperiencesSection() {
           images: t.images && t.images.length > 0 ? t.images : [],
           price: t.price || 'Contact for Price',
           duration: t.duration || 'Flexible',
+          category: t.category || 'Other',
           description: t.description,
           features: t.features || [],
         })));
@@ -57,6 +64,23 @@ export function ExperiencesSection() {
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">{heading.description}</p>
         </motion.div>
+
+        {!loading && categories.length > 2 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => { setActiveCategory(cat); setShowAll(false); }}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat
+                  ? 'bg-[#2E5D4B] dark:bg-emerald-500 text-white'
+                  : 'bg-[#FBF8F3] dark:bg-slate-900 text-gray-600 dark:text-gray-300 hover:bg-[#EFF7F3] dark:hover:bg-slate-800'
+                  }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
 
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -115,13 +139,13 @@ export function ExperiencesSection() {
           </div>
         )}
 
-        {!showAll && tours.length > TOUR_PREVIEW_COUNT && (
+        {!showAll && filteredTours.length > TOUR_PREVIEW_COUNT && (
           <div className="text-center mt-10">
             <button
               onClick={() => setShowAll(true)}
               className="px-6 py-3 rounded-full border-2 border-[#2E5D4B] dark:border-emerald-400 text-[#2E5D4B] dark:text-emerald-400 font-semibold hover:bg-[#2E5D4B] dark:hover:bg-emerald-400 hover:text-white dark:hover:text-slate-950 transition-colors"
             >
-              Show {tours.length - TOUR_PREVIEW_COUNT} More Experiences
+              Show {filteredTours.length - TOUR_PREVIEW_COUNT} More Experiences
             </button>
           </div>
         )}

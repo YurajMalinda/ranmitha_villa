@@ -11,7 +11,7 @@ class AppError extends Error {
 class TourService {
   async createTour(body: any, imageUrls: Record<string, string>) {
     try {
-      const { name, description, price, duration, features } = body
+      const { name, description, price, duration, category, features } = body
 
       const images = Object.values(imageUrls).filter(Boolean)
 
@@ -25,6 +25,7 @@ class TourService {
         description,
         price: price || 'Contact for Price',
         duration: duration || 'Flexible',
+        category: category?.trim() || 'Other',
         features: parsedFeatures,
         images,
       }
@@ -41,7 +42,7 @@ class TourService {
 
   async updateTour(body: any, newImageUrls: Record<string, string>) {
     try {
-      const { tourId, name, description, price, duration, features, keptImages } = body
+      const { tourId, name, description, price, duration, category, features, keptImages } = body
 
       const tour: any = await TourRepository.getOne(tourId)
       if (!tour) throw new AppError('Not found tour details', 404)
@@ -73,6 +74,7 @@ class TourService {
       tour['description'] = description
       tour['price'] = price || 'Contact for Price'
       tour['duration'] = duration || 'Flexible'
+      tour['category'] = category?.trim() || 'Other'
       if (features) {
         try { tour['features'] = JSON.parse(features) } catch { tour['features'] = [] }
       }

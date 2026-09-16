@@ -1,10 +1,26 @@
 'use client'
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { MapPin, ChevronDown } from 'lucide-react';
+import { MapPin, ChevronDown, Sun, Cloud, CloudSun, CloudFog, CloudDrizzle, CloudRain, CloudSnow, CloudLightning } from 'lucide-react';
 import { heroData } from '@/data/hero';
+import { WeatherService } from '@/services/frontend/weather.service';
+
+/** WMO weather codes (Open-Meteo) collapsed into an icon. Mirrors the label
+ *  mapping in lib/weather.ts, kept separate since that file pulls in
+ *  server-only DB code that must not reach the client bundle. */
+function weatherIcon(code: number) {
+  if (code === 0) return Sun;
+  if (code === 1 || code === 2) return CloudSun;
+  if (code === 3) return Cloud;
+  if (code === 45 || code === 48) return CloudFog;
+  if ([51, 53, 55, 56, 57].includes(code)) return CloudDrizzle;
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return CloudRain;
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return CloudSnow;
+  if (code === 95 || code === 96 || code === 99) return CloudLightning;
+  return Cloud;
+}
 
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
@@ -15,6 +31,18 @@ export function HeroSection() {
 
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  const [weather, setWeather] = useState<{ tempC: number; label: string; weatherCode: number } | null>(null);
+
+  useEffect(() => {
+    WeatherService.getCurrent()
+      .then((data) => {
+        if (data?.success) setWeather(data);
+      })
+      .catch(() => {
+        /* badge just doesn't render */
+      });
+  }, []);
 
   const { content, images } = heroData;
   const { title, description, stats, cta, badge } = content;
@@ -46,18 +74,38 @@ export function HeroSection() {
         style={{ opacity }}
         className="relative z-20 text-center px-4 max-w-5xl mx-auto pt-20">
 
-        {/* Location Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 mb-6">
+        {/* Location + Weather Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
 
-          <MapPin className="w-4 h-4 text-[#D4784A]" />
-          <span className="text-white/90 text-sm font-medium">
-            {badge}
-          </span>
-        </motion.div>
+            <MapPin className="w-4 h-4 text-[#D4784A]" />
+            <span className="text-white/90 text-sm font-medium">
+              {badge}
+            </span>
+          </motion.div>
+
+          {weather && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20"
+              title={weather.label}>
+
+              {(() => {
+                const Icon = weatherIcon(weather.weatherCode);
+                return <Icon className="w-4 h-4 text-[#D4784A]" />;
+              })()}
+              <span className="text-white/90 text-sm font-medium">
+                {weather.tempC}°C · {weather.label}
+              </span>
+            </motion.div>
+          )}
+        </div>
 
         {/* Main Headline */}
         <motion.h1
